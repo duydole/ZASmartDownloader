@@ -10,9 +10,7 @@ typedef void(^ZADownloadErrorBlock)(NSError *error);                            
 typedef NS_ENUM(NSInteger, ZADownloadModelState) {
     ZADownloadModelStateDowloading,                         // downloading
     ZADownloadModelStatePaused,                             // paused.
-    ZADownloadModelStateWaiting,                            // waiting to download, not yet downloaded any bytes.
-    ZADownloadModelStateCancelled,                          // user cancel
-    //ZADownloadModelStateCompleted,                        // download completed.
+    ZADownloadModelStatePending,                            // waiting to download, not yet downloaded any bytes.
     ZADownloadModelStateInterrupted
 };
 
@@ -32,13 +30,13 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
     ZADownloadModelPriroityLow                          // Low
 };
 
-// defined SubDownloadItem
-@interface ZASubDownloadItem : NSObject
+// defined ZADownloadRequest
+@interface ZADownloadRequest : NSObject
 
 @property NSString *identifer;
 @property ZADownloadCompletionBlock completionBlock;
 @property ZADownloadProgressBlock progressBlock;
-@property ZADownloadModelState subState;
+@property ZADownloadModelState state;
 @property NSURL *destinationUrl;
 @property NSData *resumeData;
 
@@ -47,24 +45,15 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
                    progress:(ZADownloadProgressBlock)progressBlock
              destinationUrl:(NSURL*)destinationUrl
                       state:(ZADownloadModelState)state;
-
 @end
 
 // ZADownloadModel
 @interface ZADownloadItem : NSObject
 
-@property (copy, nonatomic) ZADownloadProgressBlock progressBlock;
-
-// test call back for all business progression block:
-@property NSMutableArray<ZADownloadProgressBlock> *listProgressBlock;
-
 @property NSMutableArray<ZADownloadCompletionBlock> *listCompletionBlock;
 
-// test 1:
-@property NSMutableDictionary *completionBlockDict;
-
 // test 2:
-@property NSMutableArray <ZASubDownloadItem*> *listSubDownloadItems;
+@property NSMutableArray <ZADownloadRequest*> *listSubDownloadItems;
 
 @property NSMutableArray<ZADownloadErrorBlock> *listErrorBlock;
 @property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
@@ -102,12 +91,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 - (void) addCompletionBlock: (ZADownloadCompletionBlock)completionBlock;
 
 //
-- (void) addASubDownloadItems:(ZASubDownloadItem*)subDownloadItem;
-
-// TEST: add ZADownloadProgressBlock to DownloadModel, which want to call when download success.
-- (void) addProgressBlock: (ZADownloadProgressBlock)progressBlock;
-
-- (void) addCompletionBlock:(ZADownloadCompletionBlock)completionBlock withDestinationUrl:(NSURL*)destinationUrl;
+- (void) addASubDownloadItems:(ZADownloadRequest*)subDownloadItem;
 
 // add ErrorBlock to DownloadModel, which want to call when occurring error.
 - (void) addErrorBlock: (ZADownloadErrorBlock)errorBlock;
@@ -123,10 +107,11 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 
 // execute
 - (void) start;
+- (void) startDownloadSubItem:(NSString*)identifier;
 
 // pause.
 - (void) pause;
-- (void) pauseWithId:(NSString*)identifier;
+- (void) pauseWithId:(NSString*)identifier completion:(dispatch_block_t)completion;
 
 // cancel:
 - (void) cancel;

@@ -31,14 +31,14 @@ typedef NSString* DownloadRequestId;
 
 // download a file with url:
 - (DownloadRequestId) downloadFileWithURL:(NSString*)urlString
-               directoryName:(NSString*)directoryName
-        enableBackgroundMode:(BOOL)backgroundMode
-                  retryCount:(NSUInteger)retryCount
-               retryInterval:(NSUInteger)timeoutInterval
-                    priority:(ZADownloadModelPriroity)priority
-                    progress:(ZADownloadProgressBlock)progressBlock
-                  completion:(ZADownloadCompletionBlock)completionBlock
-                     failure:(ZADownloadErrorBlock)errorBlock;
+                            directoryName:(NSString*)directoryName
+                     enableBackgroundMode:(BOOL)backgroundMode
+                               retryCount:(NSUInteger)retryCount
+                            retryInterval:(NSUInteger)timeoutInterval
+                                 priority:(ZADownloadModelPriroity)priority
+                                 progress:(ZADownloadProgressBlock)progressBlock
+                               completion:(ZADownloadCompletionBlock)completionBlock
+                                  failure:(ZADownloadErrorBlock)errorBlock;
 
 // download a file with url.
 // Default: retrycount = 3, timeoutInterval = 10
@@ -71,13 +71,11 @@ typedef NSString* DownloadRequestId;
 /**
  @brief pause a Downloading Task with URL.
  */
-- (void) pauseDowloadingOfUrl: (NSString*)urlString;
 - (void) pauseDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
 
 /**
 @brief resume a paused downloadtask or failed tasks (loss connection).
  */
-- (void) resumeDowloadingOfUrl:(NSString*)urlString;
 - (void) resumeDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
 
 /**

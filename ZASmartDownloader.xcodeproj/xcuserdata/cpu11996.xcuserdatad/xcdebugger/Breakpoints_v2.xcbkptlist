@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.566666"
+            timestampString = "585566176.333584"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "99"
@@ -26,7 +26,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.5667731"
+            timestampString = "585566176.333686"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "95"
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.566839"
+            timestampString = "585566176.33376"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "89"
@@ -58,7 +58,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.566901"
+            timestampString = "585566176.333818"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "85"
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.56696"
+            timestampString = "585566176.333878"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "43"
@@ -122,7 +122,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.567071"
+            timestampString = "585566176.333985"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "81"
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.567137"
+            timestampString = "585566176.334051"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "294"
-            endingLineNumber = "294"
+            startingLineNumber = "285"
+            endingLineNumber = "285"
             landmarkName = "-downloadImageWithUrl:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5680031"
+            timestampString = "585566176.343345"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
+            startingLineNumber = "286"
+            endingLineNumber = "286"
             landmarkName = "-downloadImageWithUrl:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -170,7 +170,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.568638"
+            timestampString = "585566176.344018"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "61"
@@ -186,11 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.569201"
+            timestampString = "585566176.344641"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "233"
-            endingLineNumber = "233"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.569766"
+            timestampString = "585566176.345233"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "451"
-            endingLineNumber = "451"
+            startingLineNumber = "460"
+            endingLineNumber = "460"
             landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
             landmarkType = "7">
          </BreakpointContent>
@@ -218,11 +218,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.570313"
+            timestampString = "585566176.34582"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "408"
-            endingLineNumber = "408"
+            startingLineNumber = "417"
+            endingLineNumber = "417"
             landmarkName = "-URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:"
             landmarkType = "7">
          </BreakpointContent>
@@ -234,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.570881"
+            timestampString = "585566176.346396"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "169"
-            endingLineNumber = "169"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.572211"
+            timestampString = "585566176.3470449"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "407"
-            endingLineNumber = "407"
+            startingLineNumber = "416"
+            endingLineNumber = "416"
             landmarkName = "-URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:"
             landmarkType = "7">
          </BreakpointContent>
@@ -266,11 +266,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.57332"
+            timestampString = "585566176.347711"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "399"
-            endingLineNumber = "399"
+            startingLineNumber = "408"
+            endingLineNumber = "408"
             landmarkName = "-getDownloadStateOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -314,11 +314,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.574819"
+            timestampString = "585566176.3484271"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "415"
-            endingLineNumber = "415"
+            startingLineNumber = "424"
+            endingLineNumber = "424"
             landmarkName = "-URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:"
             landmarkType = "7">
          </BreakpointContent>
@@ -330,11 +330,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.575422"
+            timestampString = "585566176.349126"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "404"
-            endingLineNumber = "404"
+            startingLineNumber = "413"
+            endingLineNumber = "413"
             landmarkName = "@implementation ZADownloadManager"
             landmarkType = "3">
          </BreakpointContent>
@@ -346,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.576486"
+            timestampString = "585566176.349733"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "679"
-            endingLineNumber = "679"
+            startingLineNumber = "692"
+            endingLineNumber = "692"
             landmarkName = "-resumeDownloadItem:"
             landmarkType = "7">
          </BreakpointContent>
@@ -362,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.577773"
+            timestampString = "585566176.350334"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "398"
-            endingLineNumber = "398"
+            startingLineNumber = "407"
+            endingLineNumber = "407"
             landmarkName = "-getDownloadStateOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -378,7 +378,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.578472"
+            timestampString = "585566176.350915"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "73"
@@ -474,11 +474,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.579193"
+            timestampString = "585566176.351581"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
+            startingLineNumber = "168"
+            endingLineNumber = "168"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -506,11 +506,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5798399"
+            timestampString = "585566176.352327"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -522,7 +522,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.580436"
+            timestampString = "585566176.3530999"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "96"
@@ -538,7 +538,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/AppDelegate.m"
-            timestampString = "585559548.58102"
+            timestampString = "585561304.142436"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "56"
@@ -554,11 +554,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.581093"
+            timestampString = "585566176.353936"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "182"
-            endingLineNumber = "182"
+            startingLineNumber = "173"
+            endingLineNumber = "173"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -570,11 +570,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.582732"
+            timestampString = "585566176.3546799"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -634,11 +634,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.583954"
+            timestampString = "585566176.355412"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "371"
-            endingLineNumber = "371"
+            startingLineNumber = "380"
+            endingLineNumber = "380"
             landmarkName = "-cancelDowloadingOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -650,23 +650,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.584605"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "378"
-            endingLineNumber = "378"
-            landmarkName = "-cancelDowloadingOfUrl:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5851229"
+            timestampString = "585566176.356078"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "387"
@@ -682,11 +666,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.585631"
+            timestampString = "585566176.356697"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "381"
-            endingLineNumber = "381"
+            startingLineNumber = "396"
+            endingLineNumber = "396"
+            landmarkName = "-cancelDowloadingOfUrl:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+            timestampString = "585566176.357319"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "390"
+            endingLineNumber = "390"
             landmarkName = "-cancelDowloadingOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -714,11 +714,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.586156"
+            timestampString = "585566176.357958"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -730,11 +730,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.586641"
+            timestampString = "585566176.358556"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
+            startingLineNumber = "145"
+            endingLineNumber = "145"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -746,11 +746,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.587111"
+            timestampString = "585566176.359135"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "165"
-            endingLineNumber = "165"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -762,11 +762,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.587589"
+            timestampString = "585566176.3595591"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "417"
-            endingLineNumber = "417"
+            startingLineNumber = "426"
+            endingLineNumber = "426"
             landmarkName = "-URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:"
             landmarkType = "7">
          </BreakpointContent>
@@ -778,11 +778,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5880719"
+            timestampString = "585566176.35998"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "180"
-            endingLineNumber = "180"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -794,11 +794,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.588544"
+            timestampString = "585566176.360651"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "370"
-            endingLineNumber = "370"
+            startingLineNumber = "379"
+            endingLineNumber = "379"
             landmarkName = "-cancelDowloadingOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -810,11 +810,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5890189"
+            timestampString = "585566176.361084"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -826,11 +826,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.589488"
+            timestampString = "585566176.361621"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "136"
+            endingLineNumber = "136"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -858,11 +858,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.589988"
+            timestampString = "585566176.36228"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "444"
-            endingLineNumber = "444"
+            startingLineNumber = "453"
+            endingLineNumber = "453"
             landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
             landmarkType = "7">
          </BreakpointContent>
@@ -874,11 +874,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.59048"
+            timestampString = "585566176.363342"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "533"
-            endingLineNumber = "533"
+            startingLineNumber = "546"
+            endingLineNumber = "546"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -890,11 +890,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.590978"
+            timestampString = "585566176.364409"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "532"
-            endingLineNumber = "532"
+            startingLineNumber = "545"
+            endingLineNumber = "545"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -906,13 +906,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.59146"
+            timestampString = "585566176.365353"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "656"
-            endingLineNumber = "656"
-            landmarkName = "-isValidUrl:"
-            landmarkType = "7">
+            startingLineNumber = "669"
+            endingLineNumber = "669"
+            landmarkName = "@implementation ZADownloadManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -922,11 +922,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.591961"
+            timestampString = "585566176.366267"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "423"
-            endingLineNumber = "423"
+            startingLineNumber = "432"
+            endingLineNumber = "432"
             landmarkName = "-URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:"
             landmarkType = "7">
          </BreakpointContent>
@@ -938,11 +938,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5924571"
+            timestampString = "585566176.367088"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "662"
-            endingLineNumber = "662"
+            startingLineNumber = "675"
+            endingLineNumber = "675"
             landmarkName = "-reachabilityChanged:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1048,11 +1048,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.592988"
+            timestampString = "585566176.367885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
+            startingLineNumber = "378"
+            endingLineNumber = "378"
             landmarkName = "-cancelDowloadingOfUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1064,11 +1064,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.593557"
+            timestampString = "585566176.3685679"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "104"
-            endingLineNumber = "104"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1128,7 +1128,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.59412"
+            timestampString = "585566176.369424"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "87"
@@ -1144,7 +1144,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.594637"
+            timestampString = "585566176.370138"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "95"
@@ -1160,7 +1160,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.595152"
+            timestampString = "585566176.370818"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "86"
@@ -1176,7 +1176,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.595641"
+            timestampString = "585566176.3716739"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "89"
@@ -1286,7 +1286,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.596208"
+            timestampString = "585566176.372642"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "82"
@@ -1334,7 +1334,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ViewController.m"
-            timestampString = "585559548.596755"
+            timestampString = "585566176.373475"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
@@ -1366,11 +1366,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.596857"
+            timestampString = "585566176.37358"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1414,11 +1414,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.597685"
+            timestampString = "585566176.374355"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "621"
-            endingLineNumber = "621"
+            startingLineNumber = "634"
+            endingLineNumber = "634"
             landmarkName = "-getHighestPriorityZADownloadModel"
             landmarkType = "7">
             <Locations>
@@ -1478,7 +1478,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5983239"
+            timestampString = "585566176.375152"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "83"
@@ -1510,11 +1510,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5989209"
+            timestampString = "585566176.3758841"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1526,11 +1526,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.5994329"
+            timestampString = "585566176.3766201"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "236"
-            endingLineNumber = "236"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1542,11 +1542,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.599937"
+            timestampString = "585566176.3773659"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "526"
-            endingLineNumber = "526"
+            startingLineNumber = "539"
+            endingLineNumber = "539"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1558,11 +1558,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.600369"
+            timestampString = "585566176.378186"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "235"
-            endingLineNumber = "235"
+            startingLineNumber = "226"
+            endingLineNumber = "226"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:"
             landmarkType = "7">
             <Locations>
@@ -1606,11 +1606,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.600868"
+            timestampString = "585566176.3790081"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "527"
-            endingLineNumber = "527"
+            startingLineNumber = "540"
+            endingLineNumber = "540"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1622,11 +1622,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.601335"
+            timestampString = "585566176.379856"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "564"
-            endingLineNumber = "564"
+            startingLineNumber = "577"
+            endingLineNumber = "577"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1638,11 +1638,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.601794"
+            timestampString = "585566176.381005"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "495"
-            endingLineNumber = "495"
+            startingLineNumber = "508"
+            endingLineNumber = "508"
             landmarkName = "-URLSession:task:didCompleteWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1654,11 +1654,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.6022381"
+            timestampString = "585566176.381878"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "257"
-            endingLineNumber = "257"
+            startingLineNumber = "248"
+            endingLineNumber = "248"
             landmarkName = "-downloadFileWithURL:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1670,11 +1670,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.602697"
+            timestampString = "585566176.382695"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "132"
-            endingLineNumber = "132"
+            startingLineNumber = "133"
+            endingLineNumber = "133"
             landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:retryCount:retryInterval:priority:progress:completion:failure:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1686,7 +1686,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/TableViewCell/DowloaderTableViewCell.m"
-            timestampString = "585559548.60317"
+            timestampString = "585566176.3835469"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "75"
@@ -1702,11 +1702,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.603236"
+            timestampString = "585566176.383647"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "454"
-            endingLineNumber = "454"
+            startingLineNumber = "463"
+            endingLineNumber = "463"
             landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1718,11 +1718,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.60368"
+            timestampString = "585566176.3845659"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "345"
-            endingLineNumber = "345"
+            startingLineNumber = "352"
+            endingLineNumber = "352"
             landmarkName = "-resumeDowloadingOfUrl:requestId:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1734,11 +1734,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
-            timestampString = "585559548.604109"
+            timestampString = "585566176.385265"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "353"
-            endingLineNumber = "353"
+            startingLineNumber = "361"
+            endingLineNumber = "361"
             landmarkName = "-resumeDowloadingOfUrl:requestId:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1750,27 +1750,139 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-            timestampString = "585559548.6044689"
+            timestampString = "585566176.385933"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "114"
-            endingLineNumber = "114"
-            landmarkName = "-start"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
+            landmarkName = "-startDownloadSubItem:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-            timestampString = "585559548.604537"
+            timestampString = "585566176.386035"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
+            landmarkName = "-pause"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+            timestampString = "585566176.38612"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "478"
+            endingLineNumber = "478"
+            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+            timestampString = "585566176.386685"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "480"
+            endingLineNumber = "480"
+            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+            timestampString = "585566176.387183"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "474"
+            endingLineNumber = "474"
+            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__71-[ZADownloadManager URLSession:downloadTask:didFinishDownloadingToURL:]_block_invoke"
+                  moduleName = "ZASmartDownloader"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/cpu11996/Desktop/ZASmartDownloader/ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+                  timestampString = "585561172.4437259"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "481"
+                  endingLineNumber = "481"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__copy_helper_block_e8_32b40s"
+                  moduleName = "ZASmartDownloader"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/cpu11996/Desktop/ZASmartDownloader/ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+                  timestampString = "585561172.446239"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "479"
+                  endingLineNumber = "479"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadManager.m"
+            timestampString = "585566176.387661"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "475"
+            endingLineNumber = "475"
+            landmarkName = "-URLSession:downloadTask:didFinishDownloadingToURL:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
+            timestampString = "585566176.388126"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "118"
+            endingLineNumber = "118"
             landmarkName = "-pause"
             landmarkType = "7">
          </BreakpointContent>
@@ -1782,43 +1894,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-            timestampString = "585559548.604601"
+            timestampString = "585566176.388202"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
-            landmarkName = "-pauseWithId:"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
+            landmarkName = "-pause"
             landmarkType = "7">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadItem pauseWithId:]"
+                  symbolName = "-[ZADownloadItem startDownloadSubItem:]"
                   moduleName = "ZASmartDownloader"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/cpu11996/Desktop/ZASmartDownloader/ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-                  timestampString = "585558609.471571"
+                  timestampString = "585561674.931882"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "139"
-                  endingLineNumber = "139"
-                  offsetFromSymbolStart = "77">
+                  startingLineNumber = "121"
+                  endingLineNumber = "121"
+                  offsetFromSymbolStart = "99">
                </Location>
                <Location
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadItem pauseWithId:]"
+                  symbolName = "-[ZADownloadItem startDownloadSubItem:]"
                   moduleName = "ZASmartDownloader"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/cpu11996/Desktop/ZASmartDownloader/ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-                  timestampString = "585558609.474041"
+                  timestampString = "585561674.9339041"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "139"
-                  endingLineNumber = "139"
-                  offsetFromSymbolStart = "99">
+                  startingLineNumber = "121"
+                  endingLineNumber = "121"
+                  offsetFromSymbolStart = "114">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -1830,12 +1942,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
-            timestampString = "585559548.604659"
+            timestampString = "585566176.388267"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
-            landmarkName = "-pauseWithId:"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
+            landmarkName = "@implementation ZADownloadItem"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZASmartDownloader/ZADownloadManager/ZADownloadIem.m"
+            timestampString = "585566258.6961631"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "-addCompletionBlock:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

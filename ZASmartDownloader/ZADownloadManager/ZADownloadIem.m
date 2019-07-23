@@ -18,22 +18,14 @@
     self = [super init];
     if (self) {
         _downloadTask = downloadTask;
-        _progressBlock = progressBlock;
         _listSubDownloadItems = [[NSMutableArray alloc] init];
-        
-        
-        // test forward all progressionBlocks:
-        _listProgressBlock = [[NSMutableArray alloc] initWithObjects:progressBlock, nil];
-        
+
         // ver 1:
         _listCompletionBlock = [[NSMutableArray alloc] initWithObjects:completionBlock, nil];
-        
-        if (completionBlock && destinationUrl) {
-            _completionBlockDict = [[NSMutableDictionary alloc] initWithObjects:@[completionBlock] forKeys:@[destinationUrl.absoluteString]];
-        }
+
         
         _listErrorBlock = [[NSMutableArray alloc] initWithObjects:errorBlock, nil];
-        _state = ZADownloadModelStateWaiting;
+        _state = ZADownloadModelStatePending;
         _isBackgroundMode = isBackgroundMode;
         _priority = priority;
         _destinationUrl = [[NSURL alloc] init];
@@ -57,17 +49,6 @@
 - (void) addCompletionBlock: (ZADownloadCompletionBlock)completionBlock {
     [_listCompletionBlock addObject:completionBlock];
 }
-
-- (void) addCompletionBlock:(ZADownloadCompletionBlock)completionBlock withDestinationUrl:(NSURL *)destinationUrl {
-    [_completionBlockDict setObject:completionBlock forKey:destinationUrl.absoluteString];
-}
-
-- (void)addProgressBlock:(ZADownloadProgressBlock)progressBlock {
-    if (progressBlock) {
-        [_listProgressBlock addObject:progressBlock];
-    }
-}
-
 
 - (void) forwardAllCompletionBlockWithDestinationUrl:(NSURL*)destinationUrl {
     // foward:
@@ -115,6 +96,22 @@
     [_downloadTask resume];
 }
 
+- (void) startDownloadSubItem:(NSString *)identifier {
+    NSLog(@"dld: begin to start subItem: %@",identifier);
+    NSLog(@"dld: total sub item: %lu",_listSubDownloadItems.count);
+    
+    _state = ZADownloadModelStateDowloading;
+
+    for (ZADownloadRequest *subItem in self.listSubDownloadItems) {
+        if ([subItem.identifer isEqualToString:identifier]) {
+            subItem.state = ZADownloadModelStateDowloading;
+            [_downloadTask resume];
+            NSLog(@"dld: finished to start subItem: %@",identifier);
+        }
+    }
+}
+
+
 - (void) pause {
     // nếu có ít nhất 1 thằng đang downloading -> thì ko change trạng thái.
     
@@ -128,45 +125,52 @@
                 // Download can't be resumed.
                 NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeCannotBeResumed userInfo:nil];
                 [self forwardAllErrorBlockWithError:error];
-                self.state = ZADownloadModelStateCancelled;
+                
+                // remove?
+                
+                // self.state = ZADownloadModelStateCancelled;
             }
         }];
     }
 }
 
 - (void) pauseWithId:(NSString *)identifier {
+}
+
+- (void)pauseWithId:(NSString *)identifier completion:(dispatch_block_t)completion {
     // change state of subItem
-    for (ZASubDownloadItem *subItem in _listSubDownloadItems) {
+    for (ZADownloadRequest *subItem in _listSubDownloadItems) {
         if (subItem.identifer == identifier) {
-            subItem.subState = ZADownloadModelStatePaused;
+            subItem.state = ZADownloadModelStatePaused;
+            
             [_downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
                 if (resumeData) {
                     subItem.resumeData = resumeData;
+                    self.resumeData = resumeData;
+                    completion();
                 }
             }];
         }
     }
-    
-    // start other subItem.
 }
 
 - (void) cancel {
     [_downloadTask cancel];
-    _state = ZADownloadModelStateCancelled;
+    //_state = ZADownloadModelStateCancelled;
 }
 
 - (NSUInteger)totalWaitingRequest {
     return _listCompletionBlock.count;
 }
 
-- (void)addASubDownloadItems:(ZASubDownloadItem *)subDownloadItem {
+- (void)addASubDownloadItems:(ZADownloadRequest *)subDownloadItem {
     [_listSubDownloadItems addObject:subDownloadItem];
 }
 
 @end
 
 // impletion ZASubDownloadItem
-@implementation ZASubDownloadItem
+@implementation ZADownloadRequest
 
 - (instancetype)initWithId:(NSString *)identifier
                 completion:(ZADownloadCompletionBlock)completionBlock
@@ -179,7 +183,7 @@
         _completionBlock = completionBlock;
         _progressBlock = progressBlock;
         _destinationUrl = destinationUrl;
-        _subState = state;
+        _state = state;
     }
     return self;
 }

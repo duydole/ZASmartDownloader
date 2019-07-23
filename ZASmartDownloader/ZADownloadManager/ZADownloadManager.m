@@ -98,15 +98,16 @@
                   completion:(ZADownloadCompletionBlock)completionBlock
                      failure:(ZADownloadErrorBlock)errorBlock {
     
+    // identifier of request:
     NSString *identifier = [[NSUUID UUID] UUIDString];
     
     // download:
     dispatch_async(_fileDownloaderSerialQueue, ^{
         
-        // Get fileName:
+        // gen fileName:
         NSString *fileName = [urlString lastPathComponent];
 
-        // Check valid url:
+        // get valid url:
         if (![self isValidUrl:urlString]) {
             if (errorBlock) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -120,8 +121,8 @@
         // Check in dictionary:
         ZADownloadItem *existedDownloadItem = [self.downloadItemDict objectForKey:urlString];
         NSURL *destinationUrl = nil;
+        ZADownloadRequest *subDownloadItem = nil;
         
-        ZASubDownloadItem *subDownloadItem = nil;
         if (existedDownloadItem) {
             switch (existedDownloadItem.state) {
                     
@@ -146,19 +147,9 @@
                     // get Destinarion Directory:
                     destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
 
-                    // cach 1: save completionBlock with destinationDir
-                    [existedDownloadItem addCompletionBlock:completionBlock withDestinationUrl:destinationUrl];
-
-                    // cach 2: save sub item:
-                    
-                    subDownloadItem = [[ZASubDownloadItem alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:ZADownloadModelStateDowloading];
+                    // create and add a ZADownloadRequest.
+                    subDownloadItem = [[ZADownloadRequest alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:ZADownloadModelStateDowloading];
                     [existedDownloadItem addASubDownloadItems:subDownloadItem];
-                    
-                    // save completionBlock, errorBlock.
-                    [existedDownloadItem addCompletionBlock:completionBlock];
-                    [existedDownloadItem addErrorBlock:errorBlock];
-                    [existedDownloadItem addProgressBlock:progressBlock];
-
                     break;
                     
                 case ZADownloadModelStatePaused:
@@ -168,7 +159,7 @@
                     
                     break;
 
-                case ZADownloadModelStateWaiting:
+                case ZADownloadModelStatePending:
                     //
                     
                     break;
@@ -212,7 +203,7 @@
         downloadItem.retryInterval = retryInterval;
         
         ZADownloadModelState state = ZADownloadModelStateDowloading;
-        subDownloadItem = [[ZASubDownloadItem alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:state];
+        subDownloadItem = [[ZADownloadRequest alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:state];
         [downloadItem addASubDownloadItems:subDownloadItem];
 
         
@@ -317,11 +308,27 @@
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
         
         // pause subDownload with Identifier.
-        [downloadItem pauseWithId:identifer];
+        [downloadItem pauseWithId:identifer completion:^{
+            // start another subDownload if any.
+            for (ZADownloadRequest *subItem in downloadItem.listSubDownloadItems) {
+                
+                if (subItem.state == ZADownloadModelStateDowloading) {
+                    
+                    // new download task
+                    if (downloadItem.isBackgroundMode) {
+                        downloadItem.downloadTask = [self.backgroundURLSession downloadTaskWithResumeData:downloadItem.resumeData];
+                    } else {
+                        downloadItem.downloadTask = [self.forcegroundURLSession downloadTaskWithResumeData:downloadItem.resumeData];
+                    }
+                    
+                    // start
+                    [downloadItem start];
+                    
+                    // start
+                }
+            }
+        }];
         
-        // start another subDownload if any.
-        
-     
         // resume 1 waiting download with highest priority.
         self.totalDownloadingUrls--;
         [self startHighestPriorityZADownloadItem];
@@ -344,6 +351,7 @@
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
 
         if (downloadItem && downloadItem.resumeData && ((downloadItem.state == ZADownloadModelStatePaused) || (downloadItem.state = ZADownloadModelStateInterrupted))) {
+            
             // recreate downloadtask with resumeData:
             if (downloadItem.isBackgroundMode) {
                 downloadItem.downloadTask = [self.backgroundURLSession downloadTaskWithResumeData:downloadItem.resumeData];
@@ -352,7 +360,8 @@
             }
             
             // start
-            [downloadItem start];
+            [downloadItem startDownloadSubItem:identifer];
+            
             self.totalDownloadingUrls++;
         }
         
@@ -374,7 +383,7 @@
         }
         
         // remove Item out of WaitingLists.
-        if (downloadItem.state == ZADownloadModelStateWaiting) {
+        if (downloadItem.state == ZADownloadModelStatePending) {
             [self removeAWaitingDownloadItem:downloadItem];
         }
         
@@ -422,8 +431,8 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
         return;
     }
 
-        for (ZASubDownloadItem *subDownloadItem in downloadItem.listSubDownloadItems) {
-            if (subDownloadItem.progressBlock && subDownloadItem.subState == ZADownloadModelStateDowloading) {
+        for (ZADownloadRequest *subDownloadItem in downloadItem.listSubDownloadItems) {
+            if (subDownloadItem.progressBlock && subDownloadItem.state == ZADownloadModelStateDowloading) {
                 CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
                 NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
                 NSUInteger speed = bytesWritten/1024;
@@ -446,23 +455,27 @@ didFinishDownloadingToURL:(NSURL *)location {
     }
     ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
     
-    if (downloadItem && downloadItem.completionBlockDict) {
+    if (downloadItem) {
         // move temporary file to destination:
         NSError *error;
 
-        for (ZASubDownloadItem *subDownloadItem in downloadItem.listSubDownloadItems) {
+        for (ZADownloadRequest *subDownloadItem in downloadItem.listSubDownloadItems) {
             
-            if (subDownloadItem.subState == ZADownloadModelStateDowloading) {
+            if (subDownloadItem.state == ZADownloadModelStateDowloading) {
                 NSLog(@"dld: move to des with name: %@",[subDownloadItem.destinationUrl lastPathComponent]);
                 
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:subDownloadItem.destinationUrl error:&error];
                 
                 // callback
                 ZADownloadCompletionBlock completion = subDownloadItem.completionBlock;
+                NSURL *destinationUrl = subDownloadItem.destinationUrl;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(subDownloadItem.destinationUrl);
+                    completion(destinationUrl);
                 });
+                [downloadItem.listSubDownloadItems removeObject:subDownloadItem];
+                
             }
+            
         }
         
         
@@ -574,8 +587,7 @@ didCompleteWithError:(NSError *)error {
     
     // other errors:
     // [downloadItem forwardAllErrorBlockWithError:error];
-    downloadItem.state = ZADownloadModelStateCancelled;
-    
+    // downloadItem.state = ZADownloadModelStateCancelled;
 }
 
 // notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
@@ -732,7 +744,7 @@ didCompleteWithError:(NSError *)error {
 }
 
 - (void) addToWaitingList:(ZADownloadItem*)downloadItem {
-    downloadItem.state = ZADownloadModelStateWaiting;               // waiting for download.
+    downloadItem.state = ZADownloadModelStatePending;               // waiting for download.
     switch (downloadItem.priority) {
         case ZADownloadModelPriroityHigh:
             [self.highPriorityDownloadItems addObject:downloadItem];
