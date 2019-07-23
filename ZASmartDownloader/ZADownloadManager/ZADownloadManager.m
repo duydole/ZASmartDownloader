@@ -8,6 +8,7 @@
 #define IMAGE_DIRECTORY_NAME @"Downloaded Images"
 #define TIMEOUT_INTERVAL_FOR_REQUEST 10
 
+
 @interface ZADownloadManager() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
 @property (nonatomic) NSURLSession *forcegroundURLSession;                      // manage downloadtasks on forceground.
@@ -87,7 +88,7 @@
 }
 
 #pragma mark - Public methods:
-- (void) downloadFileWithURL:(NSString*)urlString
+- (DownloadRequestId) downloadFileWithURL:(NSString*)urlString
                directoryName:(NSString*)directoryName               // sửa thành destinationPath.
         enableBackgroundMode:(BOOL)backgroundMode
                   retryCount:(NSUInteger)retryCount
@@ -96,6 +97,9 @@
                     progress:(ZADownloadProgressBlock)progressBlock
                   completion:(ZADownloadCompletionBlock)completionBlock
                      failure:(ZADownloadErrorBlock)errorBlock {
+    
+    NSString *identifier = [[NSUUID UUID] UUIDString];
+    
     // download:
     dispatch_async(_fileDownloaderSerialQueue, ^{
         
@@ -116,6 +120,8 @@
         // Check in dictionary:
         ZADownloadItem *existedDownloadItem = [self.downloadItemDict objectForKey:urlString];
         NSURL *destinationUrl = nil;
+        
+        ZASubDownloadItem *subDownloadItem = nil;
         if (existedDownloadItem) {
             switch (existedDownloadItem.state) {
                     
@@ -140,9 +146,14 @@
                     // get Destinarion Directory:
                     destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
 
-                    // save completionBlock with destinationDir
+                    // cach 1: save completionBlock with destinationDir
                     [existedDownloadItem addCompletionBlock:completionBlock withDestinationUrl:destinationUrl];
 
+                    // cach 2: save sub item:
+                    
+                    subDownloadItem = [[ZASubDownloadItem alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:ZADownloadModelStateDowloading];
+                    [existedDownloadItem addASubDownloadItems:subDownloadItem];
+                    
                     // save completionBlock, errorBlock.
                     [existedDownloadItem addCompletionBlock:completionBlock];
                     [existedDownloadItem addErrorBlock:errorBlock];
@@ -193,11 +204,18 @@
                                                                             failure:errorBlock
                                                                    isBackgroundMode:backgroundMode
                                                                            priority:priority];
+        
         downloadItem.startDate = [NSDate date];
         downloadItem.fileName = fileName;
         downloadItem.directoryName = directoryName;
         downloadItem.retryCount = retryCount;
         downloadItem.retryInterval = retryInterval;
+        
+        ZADownloadModelState state = ZADownloadModelStateDowloading;
+        subDownloadItem = [[ZASubDownloadItem alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:state];
+        [downloadItem addASubDownloadItems:subDownloadItem];
+
+        
         [self.downloadItemDict setObject:downloadItem forKey:urlString];
         
         // 3. Start downloading or waiting.
@@ -208,6 +226,8 @@
             [self addToWaitingList: downloadItem];
         }
     });
+    
+    return identifier;
 }
 
 - (void) downloadFileWithURL:(NSString *)urlString
@@ -243,8 +263,6 @@
 - (void) downloadImageWithUrl:(NSString *)urlString
                    completion:(void (^)(UIImage *, NSURL *))completionBlock
                       failure:(void (^)(NSError *))errorBlock {
-//    dispatch_async(_fileDownloaderSerialQueue, ^{
-    
         NSString *directoryName = IMAGE_DIRECTORY_NAME;
         
         // check ImageCache:
@@ -276,7 +294,6 @@
                 errorBlock(error);
             }
         }];
-//    });
 }
 
 - (void) pauseDowloadingOfUrl:(NSString *)urlString {
@@ -294,12 +311,51 @@
     });
 }
 
+- (void)pauseDowloadingOfUrl:(NSString *)urlString requestId:(NSString *)identifer {
+    dispatch_async(_fileDownloaderSerialQueue, ^{
+        //NSLog(@"dld: start PAUSE");
+        ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
+        
+        // pause subDownload with Identifier.
+        [downloadItem pauseWithId:identifer];
+        
+        // start another subDownload if any.
+        
+     
+        // resume 1 waiting download with highest priority.
+        self.totalDownloadingUrls--;
+        [self startHighestPriorityZADownloadItem];
+        //NSLog(@"dld: finished PAUSE");
+    });
+}
+
 - (void) resumeDowloadingOfUrl:(NSString *)urlString {
     dispatch_async(_fileDownloaderSerialQueue, ^{
         //NSLog(@"dld: start RESUME");
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
         [self resumeDownloadItem:downloadItem];
         //NSLog(@"dld: finished RESUME");
+    });
+}
+
+- (void)resumeDowloadingOfUrl:(NSString *)urlString requestId:(NSString *)identifer {
+    dispatch_async(_fileDownloaderSerialQueue, ^{
+        //NSLog(@"dld: start RESUME");
+        ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
+
+        if (downloadItem && downloadItem.resumeData && ((downloadItem.state == ZADownloadModelStatePaused) || (downloadItem.state = ZADownloadModelStateInterrupted))) {
+            // recreate downloadtask with resumeData:
+            if (downloadItem.isBackgroundMode) {
+                downloadItem.downloadTask = [self.backgroundURLSession downloadTaskWithResumeData:downloadItem.resumeData];
+            } else {
+                downloadItem.downloadTask = [self.forcegroundURLSession downloadTaskWithResumeData:downloadItem.resumeData];
+            }
+            
+            // start
+            [downloadItem start];
+            self.totalDownloadingUrls++;
+        }
+        
     });
 }
 
@@ -365,24 +421,24 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
         [downloadTask cancel];
         return;
     }
-    
 
-    if (downloadItem.state == ZADownloadModelStateDowloading) {
-        for (ZADownloadProgressBlock progressBlock in downloadItem.listProgressBlock) {
-            CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
-            NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
-            NSUInteger speed = bytesWritten/1024;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                progressBlock(progress, speed, remainingTime);
-            });
+        for (ZASubDownloadItem *subDownloadItem in downloadItem.listSubDownloadItems) {
+            if (subDownloadItem.progressBlock && subDownloadItem.subState == ZADownloadModelStateDowloading) {
+                CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
+                NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+                NSUInteger speed = bytesWritten/1024;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    subDownloadItem.progressBlock(progress, speed, remainingTime);
+                });
+            }
         }
-    }
 }
 
 // finished downlad file, which is stored as a temporary file in NSURL location.
 - (void)URLSession:(NSURLSession *)session
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location {
+    
     // get DownloadModel and UrlString from downloadTask.
     NSString *urlString = downloadTask.currentRequest.URL.absoluteString;
     if (!urlString) {
@@ -394,18 +450,19 @@ didFinishDownloadingToURL:(NSURL *)location {
         // move temporary file to destination:
         NSError *error;
 
-        
-        for (NSString *destinationUrlString in downloadItem.completionBlockDict.allKeys) {
-            NSLog(@"dld: move to des with name: %@",[destinationUrlString lastPathComponent]);
-
-            [[NSFileManager defaultManager] copyItemAtURL:location toURL:[NSURL URLWithString:destinationUrlString] error:&error];
-           
+        for (ZASubDownloadItem *subDownloadItem in downloadItem.listSubDownloadItems) {
             
-            // callback
-            ZADownloadCompletionBlock completion = downloadItem.completionBlockDict[destinationUrlString];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completion([NSURL URLWithString:destinationUrlString]);
-            });
+            if (subDownloadItem.subState == ZADownloadModelStateDowloading) {
+                NSLog(@"dld: move to des with name: %@",[subDownloadItem.destinationUrl lastPathComponent]);
+                
+                [[NSFileManager defaultManager] copyItemAtURL:location toURL:subDownloadItem.destinationUrl error:&error];
+                
+                // callback
+                ZADownloadCompletionBlock completion = subDownloadItem.completionBlock;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(subDownloadItem.destinationUrl);
+                });
+            }
         }
         
         

@@ -35,9 +35,18 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 // defined SubDownloadItem
 @interface ZASubDownloadItem : NSObject
 
+@property NSString *identifer;
 @property ZADownloadCompletionBlock completionBlock;
+@property ZADownloadProgressBlock progressBlock;
 @property ZADownloadModelState subState;
 @property NSURL *destinationUrl;
+@property NSData *resumeData;
+
+- (instancetype) initWithId:(NSString*)identifier
+                 completion:(ZADownloadCompletionBlock)completionBlock
+                   progress:(ZADownloadProgressBlock)progressBlock
+             destinationUrl:(NSURL*)destinationUrl
+                      state:(ZADownloadModelState)state;
 
 @end
 
@@ -92,6 +101,9 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 // add CompletionBlock to DownloadModel, which want to call when download success.
 - (void) addCompletionBlock: (ZADownloadCompletionBlock)completionBlock;
 
+//
+- (void) addASubDownloadItems:(ZASubDownloadItem*)subDownloadItem;
+
 // TEST: add ZADownloadProgressBlock to DownloadModel, which want to call when download success.
 - (void) addProgressBlock: (ZADownloadProgressBlock)progressBlock;
 
@@ -114,6 +126,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 
 // pause.
 - (void) pause;
+- (void) pauseWithId:(NSString*)identifier;
 
 // cancel:
 - (void) cancel;

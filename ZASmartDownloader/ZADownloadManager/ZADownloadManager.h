@@ -3,6 +3,8 @@
 #import "ZADownloadItem.h"
 #import <UIKit/UIKit.h>
 
+typedef NSString* DownloadRequestId;
+
 @interface ZADownloadManager : NSObject
 
  + (instancetype) sharedInstance;
@@ -28,7 +30,7 @@
 - (NSURL*) getDefaultDownloadedImageDirectoryUrl;
 
 // download a file with url:
-- (void) downloadFileWithURL:(NSString*)urlString
+- (DownloadRequestId) downloadFileWithURL:(NSString*)urlString
                directoryName:(NSString*)directoryName
         enableBackgroundMode:(BOOL)backgroundMode
                   retryCount:(NSUInteger)retryCount
@@ -70,11 +72,13 @@
  @brief pause a Downloading Task with URL.
  */
 - (void) pauseDowloadingOfUrl: (NSString*)urlString;
+- (void) pauseDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
 
 /**
 @brief resume a paused downloadtask or failed tasks (loss connection).
  */
 - (void) resumeDowloadingOfUrl:(NSString*)urlString;
+- (void) resumeDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
 
 /**
  @brief resume a paused downloadtask or failed tasks (loss connection).

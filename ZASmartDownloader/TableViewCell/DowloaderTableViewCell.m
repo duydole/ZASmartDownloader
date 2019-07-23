@@ -3,6 +3,8 @@
 
 @interface DowloaderTableViewCell()
 
+@property NSString *requestId;
+
 @end
 
 @implementation DowloaderTableViewCell
@@ -48,7 +50,7 @@
         NSUInteger retryCount = 3;
 
         // begin downloading:
-        [ZADownloadManager.sharedInstance downloadFileWithURL:url directoryName:directoryName enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
+        self.requestId = [ZADownloadManager.sharedInstance downloadFileWithURL:url directoryName:directoryName enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
             // inprogress:
             //NSLog(@"dld: Downloading file: %@ progress: %f",[self.urlLabel.text lastPathComponent], progress);
             [self.progressView setProgress:progress];
@@ -65,14 +67,19 @@
         } failure:^(NSError *error) {
             [self logErrorWithCode:error.code];
         }];
+        
+        NSLog(@"request ID: %@",self.requestId);
+        
     } else if ([self.startButton.titleLabel.text isEqualToString:@"PAUSE"]){
         // Tapped to PAUSE:
-        [ZADownloadManager.sharedInstance pauseDowloadingOfUrl:self.urlLabel.text];
+        // [ZADownloadManager.sharedInstance pauseDowloadingOfUrl:self.urlLabel.text];
+        [ZADownloadManager.sharedInstance pauseDowloadingOfUrl:self.urlLabel.text requestId:self.requestId];
+        
         [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];
         //NSLog(@"dld: tapped PAUSE, now you can tap button RESUME");
     } else if ([self.startButton.titleLabel.text isEqualToString:@"RESUME"]){
         // Tapped to RESUME
-        [ZADownloadManager.sharedInstance resumeDowloadingOfUrl:self.urlLabel.text];
+        [ZADownloadManager.sharedInstance resumeDowloadingOfUrl:self.urlLabel.text requestId:self.requestId];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         //NSLog(@"dld: tapped RESUME, now you can tap button PAUSE");
     } else if ([self.startButton.titleLabel.text isEqualToString:@"RETRY"]) {

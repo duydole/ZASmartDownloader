@@ -18,8 +18,9 @@
     self = [super init];
     if (self) {
         _downloadTask = downloadTask;
-        
         _progressBlock = progressBlock;
+        _listSubDownloadItems = [[NSMutableArray alloc] init];
+        
         
         // test forward all progressionBlocks:
         _listProgressBlock = [[NSMutableArray alloc] initWithObjects:progressBlock, nil];
@@ -133,6 +134,22 @@
     }
 }
 
+- (void) pauseWithId:(NSString *)identifier {
+    // change state of subItem
+    for (ZASubDownloadItem *subItem in _listSubDownloadItems) {
+        if (subItem.identifer == identifier) {
+            subItem.subState = ZADownloadModelStatePaused;
+            [_downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+                if (resumeData) {
+                    subItem.resumeData = resumeData;
+                }
+            }];
+        }
+    }
+    
+    // start other subItem.
+}
+
 - (void) cancel {
     [_downloadTask cancel];
     _state = ZADownloadModelStateCancelled;
@@ -142,18 +159,27 @@
     return _listCompletionBlock.count;
 }
 
+- (void)addASubDownloadItems:(ZASubDownloadItem *)subDownloadItem {
+    [_listSubDownloadItems addObject:subDownloadItem];
+}
+
 @end
-
-
 
 // impletion ZASubDownloadItem
 @implementation ZASubDownloadItem
 
-- (instancetype)init
-{
+- (instancetype)initWithId:(NSString *)identifier
+                completion:(ZADownloadCompletionBlock)completionBlock
+                  progress:(ZADownloadProgressBlock)progressBlock
+            destinationUrl:(NSURL *)destinationUrl
+                     state:(ZADownloadModelState)state {
     self = [super init];
     if (self) {
-        
+        _identifer = identifier;
+        _completionBlock = completionBlock;
+        _progressBlock = progressBlock;
+        _destinationUrl = destinationUrl;
+        _subState = state;
     }
     return self;
 }
