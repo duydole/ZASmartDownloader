@@ -98,9 +98,11 @@
                      failure:(ZADownloadErrorBlock)errorBlock {
     // download:
     dispatch_async(_fileDownloaderSerialQueue, ^{
+        
+        // Get fileName:
         NSString *fileName = [urlString lastPathComponent];
 
-        // check valid url:
+        // Check valid url:
         if (![self isValidUrl:urlString]) {
             if (errorBlock) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -111,93 +113,100 @@
             return;
         }
         
-        // if fileName is existed in Directory, then return File URL.
-        if ([self isExistedFile:fileName inDirectory:directoryName]) {
-            NSLog(@"dld: File %@ existed in directory: %@",fileName,directoryName);
-            if(completionBlock) {
-                NSURL *fileUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completionBlock(fileUrl);
-                });
+        // Check in dictionary:
+        ZADownloadItem *existedDownloadItem = [self.downloadItemDict objectForKey:urlString];
+        NSURL *destinationUrl = nil;
+        if (existedDownloadItem) {
+            switch (existedDownloadItem.state) {
+                    
+                // Url is downloading:
+                case ZADownloadModelStateDowloading:
+                    NSLog(@"dld: Other Bussiness is downloading, just wait....");
+                    
+                    // if downloading Item has the same directoryName
+                    if ([existedDownloadItem.directoryName isEqualToString:directoryName]) {
+                        
+                        // gen newFileName
+                        NSUInteger totalWaitingRequest = [existedDownloadItem totalWaitingRequest];
+                        NSArray *array = [fileName componentsSeparatedByString:@"."];
+                        NSString *fileType = [array lastObject];
+                        fileName = array[0];
+                        for (int i = 1; i < array.count-1; i++) {
+                            fileName = [[NSString alloc] initWithFormat:@"%@.%@",fileName,array[i]];
+                        }
+                        fileName = [[NSString alloc] initWithFormat:@"%@ (%lu).%@",fileName,totalWaitingRequest,fileType];
+                    }
+                    
+                    // get Destinarion Directory:
+                    destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
+
+                    // save completionBlock with destinationDir
+                    [existedDownloadItem addCompletionBlock:completionBlock withDestinationUrl:destinationUrl];
+
+                    // save completionBlock, errorBlock.
+                    [existedDownloadItem addCompletionBlock:completionBlock];
+                    [existedDownloadItem addErrorBlock:errorBlock];
+                    [existedDownloadItem addProgressBlock:progressBlock];
+
+                    break;
+                    
+                case ZADownloadModelStatePaused:
+                    // add blockObject
+                    
+                    // switch to state Downloading..
+                    
+                    break;
+
+                case ZADownloadModelStateWaiting:
+                    //
+                    
+                    break;
+
+                case ZADownloadModelStateInterrupted:
+                    
+                    break;
+                default:
+                    break;
             }
             return;
         }
         
-        // if this url is downloading: save completionBlock, errorBlock and wait.
-        if ([self isDowloadingUrl:urlString]) {
-            NSLog(@"dld: Other Bussiness is downloading, just wait....");
-            // get downlading model.
-            ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
-            
-            // if downloading Item has the same directoryName
-            NSURL *destinationUrl = nil;
-            if ([downloadItem.directoryName isEqualToString:directoryName]) {
-                NSUInteger totalWaitingRequest = [downloadItem totalWaitingRequest];
-                NSArray *array = [fileName componentsSeparatedByString:@"."];
-                NSString *fileType = [array lastObject];
-                NSString *newFileName = array[0];
-                for (int i = 1; i < array.count-1; i++) {
-                    newFileName = [[NSString alloc] initWithFormat:@"%@.%@",newFileName,array[i]];
-                }
-                newFileName = [[NSString alloc] initWithFormat:@"%@ (%lu).%@",newFileName,totalWaitingRequest,fileType];
-                
-                // destinationUrl:
-                destinationUrl = [self getFileUrlWithFileName:newFileName directoryName:directoryName];
-            } else {
-                // different directoryName/destination
-                destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
-            }
-            
-            // save completionBlock with destinationDir
-            [downloadItem addCompletionBlock:completionBlock withDestinationUrl:destinationUrl];
-            
-            // save completionBlock, errorBlock.
-            if (completionBlock) {
-                [downloadItem addCompletionBlock:completionBlock];
-            }
-            if (errorBlock) {
-                [downloadItem addErrorBlock:errorBlock];
-            }
-            return;
+        // First request, start downloading or waiting.
+        NSLog(@"dld: I'm the only one download file: %@",fileName);
+
+        // 1. create downloadtask:
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        NSURLSessionDownloadTask *downloadTask;
+        if (backgroundMode) {
+            downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
         } else {
-            NSLog(@"dld: I'm the only one download file: %@",fileName);
-            // First download request on input UrlString.            
-            // 1. create downloadtask:
-            NSURL *url = [NSURL URLWithString:urlString];
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-            NSURLSessionDownloadTask *downloadTask;
-            if (backgroundMode) {
-                downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
-            } else {
-                downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
-            }
-            
-            // 2. create downloadItem, add to dict.
-            NSURL *destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
-            ZADownloadItem *downloadItem = [[ZADownloadItem alloc] initWithDownloadTask:downloadTask
-                                                                         destinationUrl:destinationUrl
-                                                                               progress:progressBlock
-                                                                             completion:completionBlock
-                                                                                failure:errorBlock
-                                                                       isBackgroundMode:backgroundMode
-                                                                               priority:priority];
-            downloadItem.startDate = [NSDate date];
-            downloadItem.fileName = fileName;
-            downloadItem.directoryName = directoryName;
-            downloadItem.retryCount = retryCount;
-            downloadItem.retryInterval = retryInterval;
-            [self.downloadItemDict setObject:downloadItem forKey:urlString];
-            
-            // 3. Start downloading or waiting.
-            if ([self canStartADownloadItem]) {
-                self.totalDownloadingUrls++;
-                [downloadItem start];
-            } else {
-                [self addToWaitingList: downloadItem];
-            }
+            downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
         }
         
-        //???
+        // 2. create downloadItem, add to dict.
+        destinationUrl = [self getFileUrlWithFileName:fileName directoryName:directoryName];
+        ZADownloadItem *downloadItem = [[ZADownloadItem alloc] initWithDownloadTask:downloadTask
+                                                                     destinationUrl:destinationUrl
+                                                                           progress:progressBlock
+                                                                         completion:completionBlock
+                                                                            failure:errorBlock
+                                                                   isBackgroundMode:backgroundMode
+                                                                           priority:priority];
+        downloadItem.startDate = [NSDate date];
+        downloadItem.fileName = fileName;
+        downloadItem.directoryName = directoryName;
+        downloadItem.retryCount = retryCount;
+        downloadItem.retryInterval = retryInterval;
+        [self.downloadItemDict setObject:downloadItem forKey:urlString];
+        
+        // 3. Start downloading or waiting.
+        if ([self canStartADownloadItem]) {
+            self.totalDownloadingUrls++;
+            [downloadItem start];
+        } else {
+            [self addToWaitingList: downloadItem];
+        }
     });
 }
 
@@ -234,7 +243,7 @@
 - (void) downloadImageWithUrl:(NSString *)urlString
                    completion:(void (^)(UIImage *, NSURL *))completionBlock
                       failure:(void (^)(NSError *))errorBlock {
-    dispatch_async(_fileDownloaderSerialQueue, ^{
+//    dispatch_async(_fileDownloaderSerialQueue, ^{
     
         NSString *directoryName = IMAGE_DIRECTORY_NAME;
         
@@ -267,13 +276,15 @@
                 errorBlock(error);
             }
         }];
-    });
+//    });
 }
 
 - (void) pauseDowloadingOfUrl:(NSString *)urlString {
     dispatch_async(_fileDownloaderSerialQueue, ^{
         //NSLog(@"dld: start PAUSE");
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
+        
+        // nếu có ít nhất 1 thằng SubItem đang downloading... thì
         [downloadItem pause];
         
         // resume 1 waiting download with highest priority.
@@ -312,6 +323,7 @@
         }
         
         [downloadItem cancel];
+        [self.downloadItemDict removeObjectForKey:urlString];
         
         // resume a waiting downloadmodel.
         [self startHighestPriorityZADownloadItem];
@@ -354,14 +366,16 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
         return;
     }
     
-    // call progressBlock for Dowloading DownloadModel.
-    if (downloadItem.progressBlock && downloadTask.state == ZADownloadModelStateDowloading) {
-        CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
-        NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
-        NSUInteger speed = bytesWritten/1024;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            downloadItem.progressBlock(progress, speed, remainingTime);
-        });
+
+    if (downloadItem.state == ZADownloadModelStateDowloading) {
+        for (ZADownloadProgressBlock progressBlock in downloadItem.listProgressBlock) {
+            CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
+            NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+            NSUInteger speed = bytesWritten/1024;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                progressBlock(progress, speed, remainingTime);
+            });
+        }
     }
 }
 
@@ -383,17 +397,15 @@ didFinishDownloadingToURL:(NSURL *)location {
         
         for (NSString *destinationUrlString in downloadItem.completionBlockDict.allKeys) {
             NSLog(@"dld: move to des with name: %@",[destinationUrlString lastPathComponent]);
-//            // move
-//            [[NSFileManager defaultManager] moveItemAtURL:location
-//                                                    toURL:[NSURL URLWithString:destinationUrlString]
-//                                                    error:&error];
-//            
+
             [[NSFileManager defaultManager] copyItemAtURL:location toURL:[NSURL URLWithString:destinationUrlString] error:&error];
            
             
             // callback
             ZADownloadCompletionBlock completion = downloadItem.completionBlockDict[destinationUrlString];
-            completion([NSURL URLWithString:destinationUrlString]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion([NSURL URLWithString:destinationUrlString]);
+            });
         }
         
         

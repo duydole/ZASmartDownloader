@@ -18,7 +18,11 @@
     self = [super init];
     if (self) {
         _downloadTask = downloadTask;
+        
         _progressBlock = progressBlock;
+        
+        // test forward all progressionBlocks:
+        _listProgressBlock = [[NSMutableArray alloc] initWithObjects:progressBlock, nil];
         
         // ver 1:
         _listCompletionBlock = [[NSMutableArray alloc] initWithObjects:completionBlock, nil];
@@ -55,6 +59,12 @@
 
 - (void) addCompletionBlock:(ZADownloadCompletionBlock)completionBlock withDestinationUrl:(NSURL *)destinationUrl {
     [_completionBlockDict setObject:completionBlock forKey:destinationUrl.absoluteString];
+}
+
+- (void)addProgressBlock:(ZADownloadProgressBlock)progressBlock {
+    if (progressBlock) {
+        [_listProgressBlock addObject:progressBlock];
+    }
 }
 
 
@@ -105,6 +115,8 @@
 }
 
 - (void) pause {
+    // nếu có ít nhất 1 thằng đang downloading -> thì ko change trạng thái.
+    
     if (_state == ZADownloadModelStateDowloading) {
         _state = ZADownloadModelStatePaused;
         [_downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
@@ -128,6 +140,22 @@
 
 - (NSUInteger)totalWaitingRequest {
     return _listCompletionBlock.count;
+}
+
+@end
+
+
+
+// impletion ZASubDownloadItem
+@implementation ZASubDownloadItem
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        
+    }
+    return self;
 }
 
 @end

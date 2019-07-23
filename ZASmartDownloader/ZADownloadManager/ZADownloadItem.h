@@ -1,13 +1,18 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 
+// Defined blocks:
+typedef void(^ZADownloadProgressBlock)(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds);                // Progress block.
+typedef void(^ZADownloadCompletionBlock)(NSURL *destinationUrl);                                                        // Completion block.
+typedef void(^ZADownloadErrorBlock)(NSError *error);                                                                    // Error block.
+
 // Defined DownloadModel State.
 typedef NS_ENUM(NSInteger, ZADownloadModelState) {
-    ZADownloadModelStateDowloading,                      // downloading
-    ZADownloadModelStatePaused,                          // paused.
-    ZADownloadModelStateWaiting,                         // waiting to download, not yet downloaded any bytes.
-    ZADownloadModelStateCancelled,                       // user cancel
-    //ZADownloadModelStateCompleted,                       // download completed.
+    ZADownloadModelStateDowloading,                         // downloading
+    ZADownloadModelStatePaused,                             // paused.
+    ZADownloadModelStateWaiting,                            // waiting to download, not yet downloaded any bytes.
+    ZADownloadModelStateCancelled,                          // user cancel
+    //ZADownloadModelStateCompleted,                        // download completed.
     ZADownloadModelStateInterrupted
 };
 
@@ -27,19 +32,30 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
     ZADownloadModelPriroityLow                          // Low
 };
 
-// Defined blocks:
-typedef void(^ZADownloadProgressBlock)(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds);                // Progress block.
-typedef void(^ZADownloadCompletionBlock)(NSURL *destinationUrl);                                                        // Completion block.
-typedef void(^ZADownloadErrorBlock)(NSError *error);                                                                    // Error block.
+// defined SubDownloadItem
+@interface ZASubDownloadItem : NSObject
+
+@property ZADownloadCompletionBlock completionBlock;
+@property ZADownloadModelState subState;
+@property NSURL *destinationUrl;
+
+@end
 
 // ZADownloadModel
 @interface ZADownloadItem : NSObject
 
 @property (copy, nonatomic) ZADownloadProgressBlock progressBlock;
+
+// test call back for all business progression block:
+@property NSMutableArray<ZADownloadProgressBlock> *listProgressBlock;
+
 @property NSMutableArray<ZADownloadCompletionBlock> *listCompletionBlock;
 
-// test:
+// test 1:
 @property NSMutableDictionary *completionBlockDict;
+
+// test 2:
+@property NSMutableArray <ZASubDownloadItem*> *listSubDownloadItems;
 
 @property NSMutableArray<ZADownloadErrorBlock> *listErrorBlock;
 @property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
@@ -75,6 +91,9 @@ typedef void(^ZADownloadErrorBlock)(NSError *error);                            
 
 // add CompletionBlock to DownloadModel, which want to call when download success.
 - (void) addCompletionBlock: (ZADownloadCompletionBlock)completionBlock;
+
+// TEST: add ZADownloadProgressBlock to DownloadModel, which want to call when download success.
+- (void) addProgressBlock: (ZADownloadProgressBlock)progressBlock;
 
 - (void) addCompletionBlock:(ZADownloadCompletionBlock)completionBlock withDestinationUrl:(NSURL*)destinationUrl;
 

@@ -80,8 +80,9 @@
     [self waitForExpectations:@[expectation] timeout:10];
 }
 
+// download 1 url with the same directory:
 - (void) testMultipleRequestForDownloadingAUrlOnForceground {
-    NSInteger totalOfRequests = 3;
+    NSInteger totalOfRequests = 3;  // download 1 url 3 times.
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Test download 1 url by multiple concurrent requests."];
     expectation.expectedFulfillmentCount = totalOfRequests;
     
@@ -93,7 +94,7 @@
     // delete if existed:
     [self deleteFileName:fileName inDirectory:directoryName];
     
-    // start to download:
+    // start to download 3 times:
     dispatch_apply(totalOfRequests, DISPATCH_APPLY_AUTO, ^(size_t t) {
         NSLog(@"dld: Iteration %lu",t);
         [ZADownloadManager.sharedInstance downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:backgroundMode priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
@@ -387,6 +388,29 @@
 
     XCTAssertEqual(ZADownloadManager.sharedInstance.numberOfDownloadingUrls, 1, @"Number of downloading urls should be 1");
 }
+
+// test download a cancelled download.
+- (void) testReDownloadACancelledDownload {
+    // 0. setup
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Should download this image 1 time, then return with cache"];
+    expectation.expectedFulfillmentCount = 1;
+    NSString *urlString = imageUrl1;
+    [self deleteFileName:[urlString lastPathComponent] inDirectoryUrl:_downloadedImageDirectoryUrl];
+    
+    
+    // 1. download:
+    [ZADownloadManager.sharedInstance downloadImageWithUrl:urlString completion:nil failure:nil];
+    
+    // 2. cancel:
+    [ZADownloadManager.sharedInstance cancelDowloadingOfUrl:urlString];
+    
+    // 3. download again.
+    [ZADownloadManager.sharedInstance downloadImageWithUrl:urlString completion:nil failure:nil];
+    
+    [self waitForExpectations:@[expectation] timeout:10];
+}
+
+// test download 
 
 # pragma mark - Support methods:
 - (void) deleteFileName:(NSString*)fileName

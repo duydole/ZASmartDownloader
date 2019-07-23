@@ -42,16 +42,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // create a downloadTask
-    
-    // start
-    
-    // pause
-    
-    // resume
-    
-    
-    
     [self setup];
     [self loadData];
     
@@ -67,10 +57,16 @@
 
 - (void) loadData {
     DownloadItem *download1 = [[DownloadItem alloc] init];
-    download1.downloadFileName = @"APPLE DOCS";
+    download1.downloadFileName = @"APPLE DOCS - BUSINESS 1";
     download1.downloadUrlString = urlString1;
     download1.priority = ZADownloadModelPriroityHigh;
     [_downloadFiles addObject:download1];
+   
+    DownloadItem *download11 = [[DownloadItem alloc] init];
+    download11.downloadFileName = @"APPLE DOCS - BUSINESS 2";
+    download11.downloadUrlString = urlString1;
+    download11.priority = ZADownloadModelPriroityHigh;
+    [_downloadFiles addObject:download11];
     
     DownloadItem *download2 = [[DownloadItem alloc] init];
     download2.downloadFileName = @"VS CODE ZIP";
