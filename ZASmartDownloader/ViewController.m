@@ -46,7 +46,7 @@
     [self loadData];
     
     // setup DownloadManager
-    ZADownloadManager.sharedInstance.maxConcurrentDownloads = 1;        // maximum concurrent downloads.
+    ZADownloadManager.sharedInstance.maxConcurrentDownloads = 2;        // maximum concurrent downloads.
 }
 
 - (void) setup {
@@ -68,6 +68,12 @@
     download11.priority = ZADownloadModelPriroityHigh;
     [_downloadFiles addObject:download11];
     
+    DownloadItem *download111 = [[DownloadItem alloc] init];
+    download111.downloadFileName = @"APPLE DOCS - BUSINESS 3";
+    download111.downloadUrlString = urlString1;
+    download111.priority = ZADownloadModelPriroityHigh;
+    [_downloadFiles addObject:download111];
+    
     DownloadItem *download2 = [[DownloadItem alloc] init];
     download2.downloadFileName = @"VS CODE ZIP";
     download2.downloadUrlString = urlString2;
@@ -83,7 +89,7 @@
     DownloadItem *download4 = [[DownloadItem alloc] init];
     download4.downloadFileName = @"COC COC";
     download4.downloadUrlString = urlString4;
-    download4.priority = ZADownloadModelPriroityMedium;
+    download4.priority = ZADownloadModelPriroityHigh;
     [_downloadFiles addObject:download4];
     
     DownloadItem *download5 = [[DownloadItem alloc] init];
@@ -95,7 +101,7 @@
     DownloadItem *download6 = [[DownloadItem alloc] init];
     download6.downloadFileName = @"CHROME";
     download6.downloadUrlString = urlString6;
-    download6.priority = ZADownloadModelPriroityMedium;
+    download6.priority = ZADownloadModelPriroityLow;
     [_downloadFiles addObject:download6];
 }
 

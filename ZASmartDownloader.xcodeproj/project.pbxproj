@@ -19,7 +19,7 @@
 		EC4DF12622CC9E8B0049DBFF /* ZASmartDownloaderUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF12522CC9E8B0049DBFF /* ZASmartDownloaderUITests.m */; };
 		ECB2EE3B22CCA02000BCB30E /* DowloaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE3A22CCA02000BCB30E /* DowloaderTableViewCell.m */; };
 		ECB2EE3F22CCAB6600BCB30E /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE3D22CCAB6600BCB30E /* ZADownloadManager.m */; };
-		ECB2EE4222CCAB6900BCB30E /* ZADownloadIem.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE4122CCAB6900BCB30E /* ZADownloadIem.m */; };
+		ECB2EE4222CCAB6900BCB30E /* ZACommonDownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,8 +64,8 @@
 		ECB2EE3A22CCA02000BCB30E /* DowloaderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DowloaderTableViewCell.m; sourceTree = "<group>"; };
 		ECB2EE3D22CCAB6600BCB30E /* ZADownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZADownloadManager.m; sourceTree = "<group>"; };
 		ECB2EE3E22CCAB6600BCB30E /* ZADownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZADownloadManager.h; sourceTree = "<group>"; };
-		ECB2EE4022CCAB6900BCB30E /* ZADownloadItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZADownloadItem.h; sourceTree = "<group>"; };
-		ECB2EE4122CCAB6900BCB30E /* ZADownloadIem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZADownloadIem.m; sourceTree = "<group>"; };
+		ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZACommonDownloadItem.h; sourceTree = "<group>"; };
+		ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZACommonDownloadItem.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,8 +171,8 @@
 			isa = PBXGroup;
 			children = (
 				E1156F0D22E0528D0056D8FB /* Reachability */,
-				ECB2EE4022CCAB6900BCB30E /* ZADownloadItem.h */,
-				ECB2EE4122CCAB6900BCB30E /* ZADownloadIem.m */,
+				ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */,
+				ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */,
 				E134592722DE1A58001143AC /* ZAImageCache.h */,
 				E134592622DE1A58001143AC /* ZAImageCache.m */,
 				ECB2EE3E22CCAB6600BCB30E /* ZADownloadManager.h */,
@@ -322,7 +322,7 @@
 				EC4DF11122CC9E8A0049DBFF /* main.m in Sources */,
 				ECB2EE3F22CCAB6600BCB30E /* ZADownloadManager.m in Sources */,
 				EC4DF10322CC9E8A0049DBFF /* AppDelegate.m in Sources */,
-				ECB2EE4222CCAB6900BCB30E /* ZADownloadIem.m in Sources */,
+				ECB2EE4222CCAB6900BCB30E /* ZACommonDownloadItem.m in Sources */,
 				ECB2EE3B22CCA02000BCB30E /* DowloaderTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import "ZADownloadItem.h"
+#import "ZACommonDownloadItem.h"
 #import <UIKit/UIKit.h>
 
 typedef NSString* DownloadRequestId;
@@ -29,16 +29,19 @@ typedef NSString* DownloadRequestId;
  */
 - (NSURL*) getDefaultDownloadedImageDirectoryUrl;
 
+// download a file with requestItem:
+- (void) downloadFileWithRequestItem:(ZADownloadItem*)requestItem;
+
 // download a file with url:
-- (DownloadRequestId) downloadFileWithURL:(NSString*)urlString
-                            directoryName:(NSString*)directoryName
-                     enableBackgroundMode:(BOOL)backgroundMode
-                               retryCount:(NSUInteger)retryCount
-                            retryInterval:(NSUInteger)timeoutInterval
-                                 priority:(ZADownloadModelPriroity)priority
-                                 progress:(ZADownloadProgressBlock)progressBlock
-                               completion:(ZADownloadCompletionBlock)completionBlock
-                                  failure:(ZADownloadErrorBlock)errorBlock;
+- (ZADownloadItem*) downloadFileWithURL:(NSString*)urlString
+                        destinationUrl:(NSURL*)destinationUrl
+                  enableBackgroundMode:(BOOL)backgroundMode
+                            retryCount:(NSUInteger)retryCount
+                         retryInterval:(NSUInteger)timeoutInterval
+                              priority:(ZADownloadModelPriroity)priority
+                              progress:(ZADownloadProgressBlock)progressBlock
+                            completion:(ZADownloadCompletionBlock)completionBlock
+                               failure:(ZADownloadErrorBlock)errorBlock;
 
 // download a file with url.
 // Default: retrycount = 3, timeoutInterval = 10
@@ -71,12 +74,12 @@ typedef NSString* DownloadRequestId;
 /**
  @brief pause a Downloading Task with URL.
  */
-- (void) pauseDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
+- (void) pauseDownloadingOfRequest:(ZADownloadItem*)requestItem;
 
 /**
 @brief resume a paused downloadtask or failed tasks (loss connection).
  */
-- (void) resumeDowloadingOfUrl: (NSString*)urlString requestId:(NSString*)identifer;
+- (void) resumeDownloadingOfRequest:(ZADownloadItem*)requestItem;
 
 /**
  @brief resume a paused downloadtask or failed tasks (loss connection).
@@ -86,7 +89,7 @@ typedef NSString* DownloadRequestId;
 /**
  @brief cancel a downlading file with urlString.
  */
-- (void) cancelDowloadingOfUrl:(NSString*)urlString;
+- (void) cancelDownloadingOfRequest:(ZADownloadItem*)requestItem;
 
 /**
  @brief get current state of a download model.
