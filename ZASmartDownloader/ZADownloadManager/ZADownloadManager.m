@@ -89,16 +89,20 @@
 
 #pragma mark - Public methods:
 - (DownloadRequestId) downloadFileWithURL:(NSString*)urlString
-               directoryName:(NSString*)directoryName               // sửa thành destinationPath.
-        enableBackgroundMode:(BOOL)backgroundMode
-                  retryCount:(NSUInteger)retryCount
-               retryInterval:(NSUInteger)retryInterval
-                    priority:(ZADownloadModelPriroity)priority
-                    progress:(ZADownloadProgressBlock)progressBlock
-                  completion:(ZADownloadCompletionBlock)completionBlock
-                     failure:(ZADownloadErrorBlock)errorBlock {
+                            directoryName:(NSString*)directoryName
+                     enableBackgroundMode:(BOOL)backgroundMode
+                               retryCount:(NSUInteger)retryCount
+                            retryInterval:(NSUInteger)retryInterval
+                                 priority:(ZADownloadModelPriroity)priority
+                                 progress:(ZADownloadProgressBlock)progressBlock
+                               completion:(ZADownloadCompletionBlock)completionBlock
+                                  failure:(ZADownloadErrorBlock)errorBlock {
+    
+    // create DownloadItem, return DownloadItem.
+    
     
     // identifier of request:
+    
     NSString *identifier = [[NSUUID UUID] UUIDString];
     
     // download:
@@ -132,7 +136,6 @@
                     
                     // if downloading Item has the same directoryName
                     if ([existedDownloadItem.directoryName isEqualToString:directoryName]) {
-                        
                         // gen newFileName
                         NSUInteger totalWaitingRequest = [existedDownloadItem totalWaitingRequest];
                         NSArray *array = [fileName componentsSeparatedByString:@"."];
@@ -149,7 +152,9 @@
 
                     // create and add a ZADownloadRequest.
                     subDownloadItem = [[ZADownloadRequest alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:ZADownloadModelStateDowloading];
-                    [existedDownloadItem addASubDownloadItems:subDownloadItem];
+                    
+                    [existedDownloadItem addRequest:subDownloadItem];
+                    
                     break;
                     
                 case ZADownloadModelStatePaused:
@@ -197,14 +202,13 @@
                                                                            priority:priority];
         
         downloadItem.startDate = [NSDate date];
-        downloadItem.fileName = fileName;
         downloadItem.directoryName = directoryName;
         downloadItem.retryCount = retryCount;
         downloadItem.retryInterval = retryInterval;
         
         ZADownloadModelState state = ZADownloadModelStateDowloading;
         subDownloadItem = [[ZADownloadRequest alloc] initWithId:identifier completion:completionBlock progress:progressBlock destinationUrl:destinationUrl state:state];
-        [downloadItem addASubDownloadItems:subDownloadItem];
+        [downloadItem addRequest:subDownloadItem];
 
         
         [self.downloadItemDict setObject:downloadItem forKey:urlString];
@@ -287,22 +291,7 @@
         }];
 }
 
-- (void) pauseDowloadingOfUrl:(NSString *)urlString {
-    dispatch_async(_fileDownloaderSerialQueue, ^{
-        //NSLog(@"dld: start PAUSE");
-        ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
-        
-        // nếu có ít nhất 1 thằng SubItem đang downloading... thì
-        [downloadItem pause];
-        
-        // resume 1 waiting download with highest priority.
-        self.totalDownloadingUrls--;
-        [self startHighestPriorityZADownloadItem];
-        //NSLog(@"dld: finished PAUSE");
-    });
-}
-
-- (void)pauseDowloadingOfUrl:(NSString *)urlString requestId:(NSString *)identifer {
+- (void) pauseDowloadingOfUrl:(NSString *)urlString requestId:(NSString *)identifer {
     dispatch_async(_fileDownloaderSerialQueue, ^{
         //NSLog(@"dld: start PAUSE");
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
@@ -310,7 +299,7 @@
         // pause subDownload with Identifier.
         [downloadItem pauseWithId:identifer completion:^{
             // start another subDownload if any.
-            for (ZADownloadRequest *subItem in downloadItem.listSubDownloadItems) {
+            for (ZADownloadRequest *subItem in downloadItem.listDownloadRequests) {
                 
                 if (subItem.state == ZADownloadModelStateDowloading) {
                     
@@ -375,10 +364,11 @@
 
 - (void) cancelDowloadingOfUrl:(NSString *)urlString {
     dispatch_async(_fileDownloaderSerialQueue, ^{
+        // get Item:
         ZADownloadItem *downloadItem = [self.downloadItemDict objectForKey:urlString];
         
         // decrease total downloading urls:
-        if (downloadItem.state == ZADownloadModelStateDowloading) {
+        if (downloadItem.state == ZADownloadModelStateDowloading && self.totalDownloadingUrls > 0) {
             self.totalDownloadingUrls--;
         }
         
@@ -431,7 +421,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
         return;
     }
 
-        for (ZADownloadRequest *subDownloadItem in downloadItem.listSubDownloadItems) {
+        for (ZADownloadRequest *subDownloadItem in downloadItem.listDownloadRequests) {
             if (subDownloadItem.progressBlock && subDownloadItem.state == ZADownloadModelStateDowloading) {
                 CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
                 NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
@@ -459,7 +449,7 @@ didFinishDownloadingToURL:(NSURL *)location {
         // move temporary file to destination:
         NSError *error;
 
-        for (ZADownloadRequest *subDownloadItem in downloadItem.listSubDownloadItems) {
+        for (ZADownloadRequest *subDownloadItem in downloadItem.listDownloadRequests) {
             
             if (subDownloadItem.state == ZADownloadModelStateDowloading) {
                 NSLog(@"dld: move to des with name: %@",[subDownloadItem.destinationUrl lastPathComponent]);
@@ -472,7 +462,7 @@ didFinishDownloadingToURL:(NSURL *)location {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     completion(destinationUrl);
                 });
-                [downloadItem.listSubDownloadItems removeObject:subDownloadItem];
+                [downloadItem.listDownloadRequests removeObject:subDownloadItem];
                 
             }
             
@@ -525,6 +515,7 @@ didCompleteWithError:(NSError *)error {
             break;
         // No connection.
         case -1009:
+            NSLog(@"dld: Before decrese total Active Urls = %lu",_totalDownloadingUrls);
             _totalDownloadingUrls--;
             
             // retry:
@@ -562,6 +553,7 @@ didCompleteWithError:(NSError *)error {
             }
             
             // retry:
+            NSLog(@"dld: Before decrese total Active Urls = %lu",_totalDownloadingUrls);
             _totalDownloadingUrls--;
             if (downloadItem.retryCount>0) {
                 NSLog(@"dld: Loss connection,retryInterval: %lu, remaining retries: %lu",downloadItem.retryInterval,downloadItem.retryCount);

@@ -18,7 +18,7 @@
     self = [super init];
     if (self) {
         _downloadTask = downloadTask;
-        _listSubDownloadItems = [[NSMutableArray alloc] init];
+        _listDownloadRequests = [[NSMutableArray alloc] init];
 
         // ver 1:
         _listCompletionBlock = [[NSMutableArray alloc] initWithObjects:completionBlock, nil];
@@ -98,11 +98,11 @@
 
 - (void) startDownloadSubItem:(NSString *)identifier {
     NSLog(@"dld: begin to start subItem: %@",identifier);
-    NSLog(@"dld: total sub item: %lu",_listSubDownloadItems.count);
+    NSLog(@"dld: total sub item: %lu",_listDownloadRequests.count);
     
     _state = ZADownloadModelStateDowloading;
 
-    for (ZADownloadRequest *subItem in self.listSubDownloadItems) {
+    for (ZADownloadRequest *subItem in self.listDownloadRequests) {
         if ([subItem.identifer isEqualToString:identifier]) {
             subItem.state = ZADownloadModelStateDowloading;
             [_downloadTask resume];
@@ -134,18 +134,14 @@
     }
 }
 
-- (void) pauseWithId:(NSString *)identifier {
-}
-
 - (void)pauseWithId:(NSString *)identifier completion:(dispatch_block_t)completion {
     // change state of subItem
-    for (ZADownloadRequest *subItem in _listSubDownloadItems) {
+    for (ZADownloadRequest *subItem in _listDownloadRequests) {
         if (subItem.identifer == identifier) {
             subItem.state = ZADownloadModelStatePaused;
             
             [_downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
                 if (resumeData) {
-                    subItem.resumeData = resumeData;
                     self.resumeData = resumeData;
                     completion();
                 }
@@ -163,8 +159,8 @@
     return _listCompletionBlock.count;
 }
 
-- (void)addASubDownloadItems:(ZADownloadRequest *)subDownloadItem {
-    [_listSubDownloadItems addObject:subDownloadItem];
+- (void)addRequest:(ZADownloadRequest *)downloadRequest {
+    [_listDownloadRequests addObject:downloadRequest];
 }
 
 @end

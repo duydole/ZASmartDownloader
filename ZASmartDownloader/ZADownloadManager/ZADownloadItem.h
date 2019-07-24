@@ -38,7 +38,6 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 @property ZADownloadProgressBlock progressBlock;
 @property ZADownloadModelState state;
 @property NSURL *destinationUrl;
-@property NSData *resumeData;
 
 - (instancetype) initWithId:(NSString*)identifier
                  completion:(ZADownloadCompletionBlock)completionBlock
@@ -53,7 +52,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 @property NSMutableArray<ZADownloadCompletionBlock> *listCompletionBlock;
 
 // test 2:
-@property NSMutableArray <ZADownloadRequest*> *listSubDownloadItems;
+@property NSMutableArray <ZADownloadRequest*> *listDownloadRequests;
 
 @property NSMutableArray<ZADownloadErrorBlock> *listErrorBlock;
 @property (strong, nonatomic) NSURLSessionDownloadTask *downloadTask;
@@ -61,7 +60,6 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 @property (nonatomic) ZADownloadModelPriroity priority;
 @property (nonatomic) BOOL isBackgroundMode;
 @property (nonatomic) NSURL *destinationUrl;
-@property (copy, nonatomic) NSString *fileName;
 @property (copy, nonatomic) NSString *directoryName;
 @property (copy, nonatomic) NSDate *startDate;
 @property (copy, nonatomic) NSData *resumeData;
@@ -87,11 +85,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
                      isBackgroundMode:(BOOL)isBackgroundMode
                              priority:(ZADownloadModelPriroity)priority;
 
-// add CompletionBlock to DownloadModel, which want to call when download success.
-- (void) addCompletionBlock: (ZADownloadCompletionBlock)completionBlock;
-
-//
-- (void) addASubDownloadItems:(ZADownloadRequest*)subDownloadItem;
+- (void) addRequest:(ZADownloadRequest*)downloadRequest;
 
 // add ErrorBlock to DownloadModel, which want to call when occurring error.
 - (void) addErrorBlock: (ZADownloadErrorBlock)errorBlock;
@@ -110,7 +104,6 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 - (void) startDownloadSubItem:(NSString*)identifier;
 
 // pause.
-- (void) pause;
 - (void) pauseWithId:(NSString*)identifier completion:(dispatch_block_t)completion;
 
 // cancel:
