@@ -8,34 +8,22 @@
 
 @implementation ZACommonDownloadItem
 
-- (instancetype) initWithRequestItem:(ZADownloadItem *)requestItem {
-    
+- (instancetype) initWithRequestItem:(ZARequestItem *)requestItem {
     self = [super init];
-    
     if (self) {
-    
-        _downloadItemsDict = [[NSMutableDictionary alloc] initWithObjects:@[requestItem] forKeys:@[requestItem.requestId]];
-        
-        _backgroundMode = requestItem.isBackgroundMode;
-        
+        _requestItemsDict = [[NSMutableDictionary alloc] initWithObjects:@[requestItem] forKeys:@[requestItem.requestId]];
+        _backgroundMode = requestItem.backgroundMode;
         _commonPriority = requestItem.priority;
-        
     }
-    
     return self;
 }
 
 # pragma mark - private methods:
 - (void) setRetryCount:(NSUInteger)retryCount {
-    
     _retryCount = retryCount;
-    
     if (_maxRetryCount == 0) {
-    
         _maxRetryCount = retryCount;
-    
     }
-
 }
 
 - (void) resetRetryCount {
@@ -45,46 +33,45 @@
 # pragma mark - control item
 - (void) startDownloadingRequest:(NSString *)requestId {
     
-    _totalDownloadingSubItems++;
+    ZARequestItem *requestItem = [_requestItemsDict objectForKey:requestId];
     
-    _commonState = ZADownloadModelStateDowloading;
-    
-    ZADownloadItem *requestItem = [_downloadItemsDict objectForKey:requestId];
-    
-    requestItem.state = ZADownloadModelStateDowloading;
-    
-    [_downloadTask resume];
+    if (requestItem) {
+        _totalDownloadingSubItems++;
+        _commonState = ZADownloadItemStateDownloading;
+        requestItem.state = ZADownloadItemStateDownloading;
+        [_commonDownloadTask resume];
+    }
 }
 
 - (void) startAllPendingDownloadItems {
     
-    _totalDownloadingSubItems = _downloadItemsDict.allValues.count;
+    _totalDownloadingSubItems = _requestItemsDict.allValues.count;
     
-    _commonState = ZADownloadModelStateDowloading;
+    _commonState = ZADownloadItemStateDownloading;
     
-    for (ZADownloadItem *downloadItem in _downloadItemsDict.allValues) {
-        downloadItem.state = ZADownloadModelStateDowloading;
+    for (ZARequestItem *downloadItem in _requestItemsDict.allValues) {
+        downloadItem.state = ZADownloadItemStateDownloading;
     }
     
-    [_downloadTask resume];
+    [_commonDownloadTask resume];
 }
 
-- (void) pauseWithId:(NSString *) identifier {
+- (void) pauseDownloadingWithRequestId:(NSString *) identifier {
     
     // pause logic:
     
-    ZADownloadItem *downloadItem = [_downloadItemsDict objectForKey:identifier];
+    ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
     
-    downloadItem.state = ZADownloadModelStatePaused;
+    downloadItem.state = ZADownloadItemStatePaused;
     
     _totalDownloadingSubItems--;
     
     // pause download task:
     if (_totalDownloadingSubItems <= 0) {
         
-        [_downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+        [_commonDownloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
          
-            self.commonState = ZADownloadModelStatePaused;
+            self.commonState = ZADownloadItemStatePaused;
             
             self.commonResumeData = resumeData;
        
@@ -93,9 +80,9 @@
 }
 
 // resume a DownloadItem with Id and Session (which used to create DownloadTask)
-- (void) resumeWithId:(NSString *)identifier urlSession:(NSURLSession *)session {
+- (void) resumeDownloadingWithRequestId:(NSString *)identifier urlSession:(NSURLSession *)session {
     
-    ZADownloadItem *downloadItem = [_downloadItemsDict objectForKey:identifier];
+    ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
     
     // if has a other DownloadItem is Downloading.
     
@@ -103,94 +90,57 @@
         
         _totalDownloadingSubItems++;
         
-        downloadItem.state = ZADownloadModelStateDowloading;
+        downloadItem.state = ZADownloadItemStateDownloading;
         
         NSLog(@"dld: Resume success, total downloading: %lu",_totalDownloadingSubItems);
         
         return;
     }
     
-    
     // if all paused:
-    if (downloadItem && self.commonResumeData && (self.commonState == ZADownloadModelStatePaused || self.commonState == ZADownloadModelStateInterrupted)) {
+    if (downloadItem && self.commonResumeData && (self.commonState == ZADownloadItemStatePaused || self.commonState == ZADownloadItemStateInterrupted)) {
     
         // newDownloadTask
         NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithResumeData:self.commonResumeData];
         
-        self.downloadTask = downloadTask;
+        self.commonDownloadTask = downloadTask;
         
         _totalDownloadingSubItems ++;
         
         NSLog(@"dld: Resume success, total downloading: %lu",_totalDownloadingSubItems);
         
-        self.commonState = ZADownloadModelStateDowloading;
+        self.commonState = ZADownloadItemStateDownloading;
         
-        downloadItem.state = ZADownloadModelStateDowloading;
+        downloadItem.state = ZADownloadItemStateDownloading;
         
         [downloadTask resume];
     }
 }
 
-- (void) cancelWithId:(NSString *)identifier {
+- (void) cancelDownloadingWithRequestId:(NSString *)identifier {
 
-    ZADownloadItem *downloadItem = [_downloadItemsDict objectForKey:identifier];
+    ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
     
-    if (downloadItem.state == ZADownloadModelStateDowloading) {
+    if (downloadItem.state == ZADownloadItemStateDownloading) {
         _totalDownloadingSubItems--;
     }
     
-    [self.downloadItemsDict removeObjectForKey:identifier];
+    [self.requestItemsDict removeObjectForKey:identifier];
     
     // khi không còn thằng nào muốn tải nữa.
-    if (_downloadItemsDict.count == 0) {
+    if (_requestItemsDict.count == 0) {
         
-        [self.downloadTask cancel];
+        [self.commonDownloadTask cancel];
     
     }
     
 }
 
-- (NSUInteger) totalWaitingRequest {
-//    return _listCompletionBlock.count;
-    return 1;
-}
-
-- (void) addDownloadItem:(ZADownloadItem *)downloadItem {
-    
-    [_downloadItemsDict setObject:downloadItem forKey:downloadItem.requestId];
-
-}
-
-@end
-
-
-// impletion ZASubDownloadItem
-@implementation ZADownloadItem
-
-- (instancetype)initWithUrlString:(NSString *)urlString
-                 isBackgroundMode:(BOOL)isBackgroundMode
-                         priority:(ZADownloadModelPriroity)priority
-                   destinationUrl:(NSURL *)destinationUrl
-                         progress:(ZADownloadProgressBlock)progressBlock
-                       completion:(ZADownloadCompletionBlock)completionBlock
-                          failure:(ZADownloadErrorBlock)errorBlock {
-    
-    self = [super init];
-    
-    if (self) {
-        _requestId = [[NSUUID UUID] UUIDString];
-        _urlString = urlString;
-        _isBackgroundMode = isBackgroundMode;
-        _priority = priority;
-        _destinationUrl = destinationUrl;
-        _progressBlock = progressBlock;
-        _completionBlock = completionBlock;
-        _errorBlock = errorBlock;
-        _state = ZADownloadModelStateDowloading;        // ?????
+- (void) addRequestItem:(ZARequestItem *)requestItem {
+    if (requestItem.state == ZADownloadItemStateDownloading) {
+        _totalDownloadingSubItems++;
     }
-    
-    return self;
+    [_requestItemsDict setObject:requestItem forKey:requestItem.requestId];
 }
-
 
 @end

@@ -3,7 +3,7 @@
 
 @interface DowloaderTableViewCell()
 
-@property ZADownloadItem *downloadItem;
+@property ZARequestItem *downloadItem;
 
 @end
 

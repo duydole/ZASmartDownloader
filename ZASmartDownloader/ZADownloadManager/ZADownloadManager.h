@@ -13,9 +13,9 @@ typedef NSString* DownloadRequestId;
  * Maximum Concurrent downloadTasks.
  * Defautl: maxConcurrentDownloads = -1, no limit the concurrent downloadtasks.
  */
-@property NSInteger maxConcurrentDownloads;
+@property (nonatomic) NSInteger maxConcurrentDownloads;
 
-@property NSUInteger timeoutIntervalForRequest;
+@property (nonatomic) NSUInteger timeoutIntervalForRequest;
 
 @property (nonatomic, readonly) NSUInteger numberOfDownloadingUrls;
 
@@ -30,10 +30,10 @@ typedef NSString* DownloadRequestId;
 - (NSURL*) getDefaultDownloadedImageDirectoryUrl;
 
 // download a file with requestItem:
-- (void) downloadFileWithRequestItem:(ZADownloadItem*)requestItem;
+- (void) downloadFileWithRequestItem:(ZARequestItem*)requestItem;
 
 // download a file with url:
-- (ZADownloadItem*) downloadFileWithURL:(NSString*)urlString
+- (ZARequestItem*) downloadFileWithURL:(NSString*)urlString
                         destinationUrl:(NSURL*)destinationUrl
                   enableBackgroundMode:(BOOL)backgroundMode
                             retryCount:(NSUInteger)retryCount
@@ -74,12 +74,12 @@ typedef NSString* DownloadRequestId;
 /**
  @brief pause a Downloading Task with URL.
  */
-- (void) pauseDownloadingOfRequest:(ZADownloadItem*)requestItem;
+- (void) pauseDownloadingOfRequest:(ZARequestItem*)requestItem;
 
 /**
 @brief resume a paused downloadtask or failed tasks (loss connection).
  */
-- (void) resumeDownloadingOfRequest:(ZADownloadItem*)requestItem;
+- (void) resumeDownloadingOfRequest:(ZARequestItem*)requestItem;
 
 /**
  @brief resume a paused downloadtask or failed tasks (loss connection).
@@ -87,13 +87,8 @@ typedef NSString* DownloadRequestId;
 - (void) retryDowloadingOfUrl:(NSString*)urlString;
 
 /**
- @brief cancel a downlading file with urlString.
+ @brief cancel a downlading file with requestItem.
  */
-- (void) cancelDownloadingOfRequest:(ZADownloadItem*)requestItem;
-
-/**
- @brief get current state of a download model.
- */
-- (ZADownloadModelState) getDownloadStateOfUrl:(NSString*)urlString;
+- (void) cancelDownloadingOfRequest:(ZARequestItem*)requestItem;
 
 @end

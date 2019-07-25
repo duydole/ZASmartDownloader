@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E107F1E822E89715003194B9 /* ZARequestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = E107F1E722E89715003194B9 /* ZARequestItem.m */; };
 		E1156F1022E052980056D8FB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E1156F0F22E052980056D8FB /* Reachability.m */; };
 		E134592822DE1A58001143AC /* ZAImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = E134592622DE1A58001143AC /* ZAImageCache.m */; };
 		EC4DF10322CC9E8A0049DBFF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF10222CC9E8A0049DBFF /* AppDelegate.m */; };
@@ -40,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E107F1E622E89715003194B9 /* ZARequestItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZARequestItem.h; sourceTree = "<group>"; };
+		E107F1E722E89715003194B9 /* ZARequestItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZARequestItem.m; sourceTree = "<group>"; };
 		E1156F0E22E052980056D8FB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		E1156F0F22E052980056D8FB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		E134592622DE1A58001143AC /* ZAImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZAImageCache.m; sourceTree = "<group>"; };
@@ -171,6 +174,8 @@
 			isa = PBXGroup;
 			children = (
 				E1156F0D22E0528D0056D8FB /* Reachability */,
+				E107F1E622E89715003194B9 /* ZARequestItem.h */,
+				E107F1E722E89715003194B9 /* ZARequestItem.m */,
 				ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */,
 				ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */,
 				E134592722DE1A58001143AC /* ZAImageCache.h */,
@@ -316,6 +321,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E107F1E822E89715003194B9 /* ZARequestItem.m in Sources */,
 				EC4DF10622CC9E8A0049DBFF /* ViewController.m in Sources */,
 				E134592822DE1A58001143AC /* ZAImageCache.m in Sources */,
 				E1156F1022E052980056D8FB /* Reachability.m in Sources */,

@@ -358,7 +358,7 @@
     [ZADownloadManager.sharedInstance downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:backgroundMode priority:UILayoutPriorityDefaultHigh progress:nil completion:nil failure:nil];
 
     // check state:
-    XCTAssertEqual([ZADownloadManager.sharedInstance getDownloadStateOfUrl:urlString], ZADownloadModelStateDowloading);
+    XCTAssertEqual([ZADownloadManager.sharedInstance getDownloadStateOfUrl:urlString], ZADownloadItemStateDownloading);
 }
 
 // downloaded url -> state mus be ZADownloadStateCompleted.
@@ -380,7 +380,7 @@
 //    [ZADownloadManager.sharedInstance pauseDowloadingOfUrl:urlString requestId:requestId];
 //
 //    // check state
-//    XCTAssertEqual(ZADownloadModelStatePaused, [ZADownloadManager.sharedInstance getDownloadStateOfUrl:urlString]);
+//    XCTAssertEqual(ZADownloadItemStatePaused, [ZADownloadManager.sharedInstance getDownloadStateOfUrl:urlString]);
 }
 
 // test number downloading url.
