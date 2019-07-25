@@ -31,19 +31,31 @@
 }
 
 # pragma mark - control item
+- (void) startDownloadingAllRequests {
+    for (NSString *identifier in self.requestItemsDict) {
+        [self startDownloadingRequest:identifier];
+    }
+    [_commonDownloadTask resume];
+}
+
 - (void) startDownloadingRequest:(NSString *)requestId {
     
     ZARequestItem *requestItem = [_requestItemsDict objectForKey:requestId];
     
+    // nếu có trong dict:
     if (requestItem) {
+        // nếu chưa có Biz nào tải:
+        if (_totalDownloadingSubItems == 0) {
+            _commonState = ZADownloadItemStateDownloading;
+            [_commonDownloadTask resume];
+        }
+        
         _totalDownloadingSubItems++;
-        _commonState = ZADownloadItemStateDownloading;
         requestItem.state = ZADownloadItemStateDownloading;
-        [_commonDownloadTask resume];
     }
 }
 
-- (void) startAllPendingDownloadItems {
+- (void) startAllPendingRequestItems {
     
     _totalDownloadingSubItems = _requestItemsDict.allValues.count;
     
@@ -56,63 +68,87 @@
     [_commonDownloadTask resume];
 }
 
+- (void) pauseAlls {
+    for (NSString *identifier in self.requestItemsDict) {
+        [self pauseDownloadingWithRequestId:identifier];
+    }
+}
+
 - (void) pauseDownloadingWithRequestId:(NSString *) identifier {
-    
     // pause logic:
-    
     ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
-    
     downloadItem.state = ZADownloadItemStatePaused;
-    
     _totalDownloadingSubItems--;
     
     // pause download task:
     if (_totalDownloadingSubItems <= 0) {
-        
+        self.commonState = ZADownloadItemStatePaused;
         [_commonDownloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-         
-            self.commonState = ZADownloadItemStatePaused;
-            
-            self.commonResumeData = resumeData;
-       
+            if (resumeData) {
+                self.commonResumeData = resumeData;
+            }
         }];
     }
 }
 
-// resume a DownloadItem with Id and Session (which used to create DownloadTask)
+// resume a Paused DownloadItem with Id and Session (which used to create DownloadTask)
 - (void) resumeDownloadingWithRequestId:(NSString *)identifier urlSession:(NSURLSession *)session {
     
-    ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
-    
-    // if has a other DownloadItem is Downloading.
-    
-    if (_totalDownloadingSubItems > 0) {
-        
-        _totalDownloadingSubItems++;
-        
-        downloadItem.state = ZADownloadItemStateDownloading;
-        
-        NSLog(@"dld: Resume success, total downloading: %lu",_totalDownloadingSubItems);
-        
+    ZARequestItem *requestItem = [_requestItemsDict objectForKey:identifier];
+    if (!requestItem) {
         return;
     }
     
-    // if all paused:
-    if (downloadItem && self.commonResumeData && (self.commonState == ZADownloadItemStatePaused || self.commonState == ZADownloadItemStateInterrupted)) {
+    // commonState:
+    switch (self.commonState) {
+        case ZADownloadItemStateDownloading:
+            _totalDownloadingSubItems++;
+            requestItem.state = ZADownloadItemStateDownloading;
+            break;
+        case ZADownloadItemStatePaused:
+            
+            break;
+        case ZADownloadItemStatePending:
+            break;
+        case ZADownloadItemStateInterrupted:
+            break;
+        default:
+            break;
+    }
     
+    
+    
+    // if has a other DownloadItem is Downloading -> turn on StateDownloading.
+    if (_commonState == ZADownloadItemStateDownloading) {
+
+    } else {
+        
+    }
+    
+    // if all paused:
+    if (requestItem && self.commonResumeData && (self.commonState == ZADownloadItemStatePaused || self.commonState == ZADownloadItemStateInterrupted)) {
         // newDownloadTask
         NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithResumeData:self.commonResumeData];
-        
         self.commonDownloadTask = downloadTask;
-        
         _totalDownloadingSubItems ++;
-        
         NSLog(@"dld: Resume success, total downloading: %lu",_totalDownloadingSubItems);
-        
         self.commonState = ZADownloadItemStateDownloading;
+        requestItem.state = ZADownloadItemStateDownloading;
+        [downloadTask resume];
+        return;
+    }
+    
+    // if all paused/interrupted.. but don't have resume Data
+    if (!self.commonResumeData) {
+        // cancel:
+        [_commonDownloadTask cancel];
         
-        downloadItem.state = ZADownloadItemStateDownloading;
+        _commonState = ZADownloadItemStateDownloading;
+        requestItem.state = ZADownloadItemStateDownloading;
         
+        // create download task
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:requestItem.urlString]];
+        NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithRequest:request];
         [downloadTask resume];
     }
 }
@@ -127,13 +163,10 @@
     
     [self.requestItemsDict removeObjectForKey:identifier];
     
-    // khi không còn thằng nào muốn tải nữa.
+    // don't have any requests -> cancel CommonDownloadTask.
     if (_requestItemsDict.count == 0) {
-        
         [self.commonDownloadTask cancel];
-    
     }
-    
 }
 
 - (void) addRequestItem:(ZARequestItem *)requestItem {
@@ -141,6 +174,15 @@
         _totalDownloadingSubItems++;
     }
     [_requestItemsDict setObject:requestItem forKey:requestItem.requestId];
+}
+
+- (void) removeARequestItem:(ZARequestItem *)requestItem {
+    // if remove a Downloading Request Item and it is existed in Dict.
+    if ((requestItem.state == ZADownloadItemStateDownloading) && [_requestItemsDict objectForKey:requestItem.requestId]) {
+        _totalDownloadingSubItems--;
+    }
+    
+    [_requestItemsDict removeObjectForKey:requestItem.requestId];
 }
 
 @end

@@ -56,15 +56,18 @@
             NSInteger percent = progress*100;
             self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"%ld",(long)percent] stringByAppendingString:@"%"];
             self.remainingTimeLabel.text = [[NSString alloc] initWithFormat:@"Remaining time: %lu(s)", remainingSeconds];
-            
         } completion:^(NSURL *destinationUrl) {
-            //NSLog(@"dld: on UI, downloaded file: %@",[self.urlLabel.text lastPathComponent]);
-            [self.startButton setTitle:@"DOWNLOADED" forState:UIControlStateNormal];
-            self.startButton.enabled = false;
-            [self.progressView setProgress:1.0];
-            self.downloadedProgressLabel.text = @"100%";
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //NSLog(@"dld: on UI, downloaded file: %@",[self.urlLabel.text lastPathComponent]);
+                [self.startButton setTitle:@"DOWNLOADED" forState:UIControlStateNormal];
+                self.startButton.enabled = false;
+                [self.progressView setProgress:1.0];
+                self.downloadedProgressLabel.text = @"100%";
+            });
         } failure:^(NSError *error) {
-            [self logErrorWithCode:error.code];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self logErrorWithCode:error.code];
+            });
         }];
         
 
@@ -85,7 +88,7 @@
         
     } else if ([self.startButton.titleLabel.text isEqualToString:@"RETRY"]) {
         // Tapped to RETRY
-        [ZADownloadManager.sharedInstance retryDowloadingOfUrl:self.urlLabel.text];
+        [ZADownloadManager.sharedInstance retryDownloadingOfRequestItem:self.downloadItem];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
     }
 }
@@ -136,6 +139,10 @@
         case DownloadErrorCodeTimeoutRequest:
             NSLog(@"dld: timeouted waiting connection.");
             [self.startButton setTitle:@"RETRY" forState:UIControlStateNormal];
+            break;
+        case DownloadErrorCodeOverMaxConcurrentDownloads:
+            [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];
+            NSLog(@"dld: Over max concurrent downloads.");
             break;
         default:
             NSLog(@"dld: strange error. Let's debug");

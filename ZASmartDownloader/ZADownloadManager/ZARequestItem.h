@@ -28,14 +28,15 @@ typedef NS_ENUM(NSInteger, DownloadErrorCode) {
     DownloadErrorCodeNoConnection,
     DownloadErrorCodeTimeoutRequest,
     DownloadErrorCodeInvalidUrl,
-    DownloadErrorCodeCannotBeResumed
+    DownloadErrorCodeCannotBeResumed,
+    DownloadErrorCodeOverMaxConcurrentDownloads
 };
 
 // Defined Download Priority.
 typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
-    ZADownloadModelPriroityHigh,                        // High
+    ZADownloadModelPriroityLow,                         // Low
     ZADownloadModelPriroityMedium,                      // Medium
-    ZADownloadModelPriroityLow                          // Low
+    ZADownloadModelPriroityHigh,                        // High
 };
 
 // defined ZADownloadRequest

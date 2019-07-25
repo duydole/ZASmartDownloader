@@ -29,7 +29,13 @@ typedef NSString* DownloadRequestId;
  */
 - (NSURL*) getDefaultDownloadedImageDirectoryUrl;
 
+// download a file with RequestItem, retryCount, retryInterval.
+- (void) downloadFileWithRequestItem:(ZARequestItem*)requestItem
+                          retryCount:(NSUInteger)retryCount
+                       retryInterval:(NSUInteger)retryInterval;
+
 // download a file with requestItem:
+// Default: Retry count = 3, retryInterval = 10;
 - (void) downloadFileWithRequestItem:(ZARequestItem*)requestItem;
 
 // download a file with url:
@@ -84,7 +90,7 @@ typedef NSString* DownloadRequestId;
 /**
  @brief resume a paused downloadtask or failed tasks (loss connection).
  */
-- (void) retryDowloadingOfUrl:(NSString*)urlString;
+- (void) retryDownloadingOfRequestItem:(ZARequestItem*)requestItem;
 
 /**
  @brief cancel a downlading file with requestItem.

@@ -15,8 +15,8 @@
 @property (nonatomic) ZADownloadModelPriroity commonPriority;                           // common Priority for all DownloadItems has the same Url.
 @property (copy, nonatomic) NSDate *startDate;                                          // start downloading url
 @property (copy, nonatomic) NSData *commonResumeData;                                   // common Resume Data for all DownloadItems.
-@property (nonatomic) NSUInteger retryCount;                                            //
-@property (nonatomic) NSUInteger retryInterval;                                         //
+@property (nonatomic) NSUInteger retryCount;                                            // number of retrying download.
+@property (nonatomic) NSUInteger retryInterval;                                         // time interval between each Retry.
 
 // init
 - (instancetype) initWithRequestItem:(ZARequestItem*)requestItem;
@@ -24,13 +24,18 @@
 // add a RequestItem to Dictionary:
 - (void) addRequestItem:(ZARequestItem*)requestItem;
 
+// remove a Request:
+- (void) removeARequestItem:(ZARequestItem*)requestItem;
+
 // execute a RequestItem
 - (void) startDownloadingRequest:(NSString*)requestId;
+- (void) startDownloadingAllRequests;
 
-// start all Peding Download Items.
-- (void) startAllPendingDownloadItems;
+// start all Pending RequestItems.
+- (void) startAllPendingRequestItems;
 
 // pause a RequestItem
+- (void) pauseAlls;
 - (void) pauseDownloadingWithRequestId:(NSString*)requestId;
 
 // resume a RequestItem
