@@ -1,3 +1,11 @@
+//
+//  ZADownloadManager.m
+//  ZASmartDownloader
+//
+//  Created by Do Le Duy on 10/21/20.
+//  Copyright © 2020 vng. All rights reserved.
+//
+
 #import "ZADownloadManager.h"
 #import "AppDelegate.h"
 #import "ZAImageCache.h"
@@ -104,7 +112,8 @@
     return _forcegroundURLSession;
 }
 
-#pragma mark - Public methods:
+#pragma mark - Public methods
+
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem
                          retryCount:(NSUInteger)retryCount
                       retryInterval:(NSUInteger)retryInterval {
@@ -243,8 +252,8 @@
                         retryInterval:10];
 }
 
-- (ZARequestItem*)downloadFileWithURL:(NSString*)urlString
-                       destinationUrl:(NSURL*)destinationUrl
+- (ZARequestItem *)downloadFileWithURL:(NSString *)urlString
+                       destinationUrl:(NSURL *)destinationUrl
                  enableBackgroundMode:(BOOL)backgroundMode
                            retryCount:(NSUInteger)retryCount
                         retryInterval:(NSUInteger)retryInterval
@@ -439,7 +448,7 @@
 
 // retry download
 - (void)retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem
-                               withUrlString:(NSString*)urlString {
+                               withUrlString:(NSString *)urlString {
     
     if (commonDownloadItem.commonResumeData) {
         
@@ -520,7 +529,8 @@
     return [self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:IMAGE_DIRECTORY_NAME];
 }
 
-# pragma mark - NSURLSessionDelegate implementation:
+# pragma mark - NSURLSessionDelegate implementation
+
 // notify progress when downloading.
 - (void)URLSession:(NSURLSession *)session
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
@@ -805,7 +815,7 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (BOOL)isValidUrl: (NSString*)urlString {
+- (BOOL)isValidUrl:(NSString *)urlString {
     NSURL *url = [NSURL URLWithString:urlString];
     BOOL isValid = url && [url scheme] && [url host];
     return isValid;
@@ -868,14 +878,14 @@ didCompleteWithError:(NSError *)error {
 
 #pragma mark - Private methods: system file logics.
 
-- (void)createDirectoryWithName:(NSString*)directoryName {
+- (void)createDirectoryWithName:(NSString *)directoryName {
     NSFileManager *fileManager= [NSFileManager defaultManager];
     NSError *error = nil;
     [fileManager createDirectoryAtURL:[self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
 }
 
-- (BOOL)isExistedFileName:(NSString*)fileName
-              inDirectory:(NSURL*)directoryUrl {
+- (BOOL)isExistedFileName:(NSString *)fileName
+              inDirectory:(NSURL *)directoryUrl {
     
     NSURL *fileURL;
     
@@ -887,8 +897,8 @@ didCompleteWithError:(NSError *)error {
     return [fileURL checkResourceIsReachableAndReturnError:&error];
 }
 
-- (NSURL*)getFileUrlWithFileName:(NSString*)fileName
-                   directoryName:(NSString*)directoryName {
+- (NSURL *)getFileUrlWithFileName:(NSString *)fileName
+                   directoryName:(NSString *)directoryName {
     NSURL *fileUrl;
     if (directoryName) {
         [self createDirectoryWithName:directoryName];
