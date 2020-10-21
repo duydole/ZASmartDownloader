@@ -174,7 +174,7 @@
     [_requestItemsDict removeObjectForKey:requestItem.requestId];
 }
 
-# pragma mark - Private methods:
+# pragma mark - Private methods
 
 - (void)setRetryCount:(NSUInteger)retryCount {
     _retryCount = retryCount;

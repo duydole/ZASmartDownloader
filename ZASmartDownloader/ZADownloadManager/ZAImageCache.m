@@ -10,8 +10,8 @@
 
 @interface DownloadedImageCache()
 
-@property NSCache *imageCache;
-@property NSInteger maxMemory;
+@property (nonatomic, strong) NSCache *imageCache;
+@property (nonatomic, assign) NSInteger maxMemory;
 
 @end
 
