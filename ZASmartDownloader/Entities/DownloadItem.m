@@ -10,12 +10,14 @@
 
 @implementation DownloadItem
 
-- (instancetype) init {
+- (instancetype)initWithUrlString:(NSString *)urlString fileName:(NSString *)fileName priority:(ZADownloadModelPriroity)priority {
     self = [super init];
     if (self) {
-        _downloadFileName = [[NSString alloc] init];
-        _downloadUrlString = [[NSString alloc] init];
+        _urlString = urlString;
+        _fileName = fileName;
+        _priority = priority;
     }
+    
     return self;
 }
 

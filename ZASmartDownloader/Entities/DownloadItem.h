@@ -11,11 +11,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define CREATE_DOWNLOADITEM(url,name,p) [[DownloadItem alloc] initWithUrlString:url fileName:name priority:p]
+
 @interface DownloadItem : NSObject
 
-@property NSString *downloadUrlString;
-@property NSString *downloadFileName;
-@property ZADownloadModelPriroity priority;
+- (instancetype)initWithUrlString:(NSString *)urlString
+                         fileName:(NSString *)fileName
+                         priority:(ZADownloadModelPriroity)priority;
+
+@property (nonatomic, readonly) NSString *urlString;
+@property (nonatomic, readonly) NSString *fileName;
+@property (nonatomic, readonly) ZADownloadModelPriroity priority;
 
 @end
 

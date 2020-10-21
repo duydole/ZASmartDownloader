@@ -3,9 +3,9 @@
 #import "ZADownloadManager.h"
 #import "DownloadItem.h"
 
-#define urlString1 @"https://manuals.info.apple.com/MANUALS/1000/MA1565/en_US/iphone_user_guide.pdf";
-#define urlString2 @"https://az764295.vo.msecnd.net/stable/c7d83e57cd18f18026a8162d042843bda1bcf21f/VSCode-darwin-stable.zip";
-#define urlString3 @"https://dl.google.com/dl/android/studio/install/3.4.1.0/android-studio-ide-183.5522156-mac.dmg";
+#define urlString1 @"https://manuals.info.apple.com/MANUALS/1000/MA1565/en_US/iphone_user_guide.pdf"
+#define urlString2 @"https://az764295.vo.msecnd.net/stable/c7d83e57cd18f18026a8162d042843bda1bcf21f/VSCode-darwin-stable.zip"
+#define urlString3 @"https://dl.google.com/dl/android/studio/install/3.4.1.0/android-studio-ide-183.5522156-mac.dmg"
 #define urlString4 @"https://files1.coccoc.com/browser/mac/setup.dmg"
 #define urlString5 @"https://download.skype.com/s4l/download/mac/Skype-8.49.0.49.dmg"
 #define urlString6 @"https://dl.google.com/chrome/mac/stable/CHFA/googlechrome.dmg"
@@ -36,65 +36,28 @@
 }
 
 - (void)setupFakeData {
-    DownloadItem *download1 = [[DownloadItem alloc] init];
-    download1.downloadFileName = @"APPLE DOCS - BUSINESS 1";
-    download1.downloadUrlString = urlString1;
-    download1.priority = ZADownloadModelPriroityHigh;
-    [_dowloadModels addObject:download1];
-   
-    DownloadItem *download11 = [[DownloadItem alloc] init];
-    download11.downloadFileName = @"APPLE DOCS - BUSINESS 2";
-    download11.downloadUrlString = urlString1;
-    download11.priority = ZADownloadModelPriroityMedium;
-    [_dowloadModels addObject:download11];
     
-    DownloadItem *download111 = [[DownloadItem alloc] init];
-    download111.downloadFileName = @"APPLE DOCS - BUSINESS 3";
-    download111.downloadUrlString = urlString1;
-    download111.priority = ZADownloadModelPriroityLow;
-    [_dowloadModels addObject:download111];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 1", ZADownloadModelPriroityHigh)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 2", ZADownloadModelPriroityMedium)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 3", ZADownloadModelPriroityLow)];
     
-    DownloadItem *download2 = [[DownloadItem alloc] init];
-    download2.downloadFileName = @"VS CODE ZIP";
-    download2.downloadUrlString = urlString2;
-    download2.priority = ZADownloadModelPriroityMedium;
-    [_dowloadModels addObject:download2];
-    
-    DownloadItem *download3 = [[DownloadItem alloc] init];
-    download3.downloadFileName = @"Android Studio";
-    download3.downloadUrlString = urlString3;
-    download3.priority = ZADownloadModelPriroityLow;
-    [_dowloadModels addObject:download3];
-    
-    DownloadItem *download4 = [[DownloadItem alloc] init];
-    download4.downloadFileName = @"COC COC";
-    download4.downloadUrlString = urlString4;
-    download4.priority = ZADownloadModelPriroityHigh;
-    [_dowloadModels addObject:download4];
-    
-    DownloadItem *download5 = [[DownloadItem alloc] init];
-    download5.downloadFileName = @"SKYPE";
-    download5.downloadUrlString = urlString5;
-    download5.priority = ZADownloadModelPriroityMedium;
-    [_dowloadModels addObject:download5];
-    
-    DownloadItem *download6 = [[DownloadItem alloc] init];
-    download6.downloadFileName = @"CHROME";
-    download6.downloadUrlString = urlString6;
-    download6.priority = ZADownloadModelPriroityLow;
-    [_dowloadModels addObject:download6];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString2, @"VS CODE ZIP", ZADownloadModelPriroityMedium)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString3, @"Android Studio", ZADownloadModelPriroityLow)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString4, @"COC COC", ZADownloadModelPriroityHigh)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString5, @"SKYPE", ZADownloadModelPriroityMedium)];
+    [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString6, @"CHROME", ZADownloadModelPriroityLow)];
 }
 
 #pragma mark - UITableView DataSource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DowloaderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellId" forIndexPath:indexPath];
-    DownloadItem *downloadFile = _dowloadModels[indexPath.row];
-    
-    cell.fileName.text = [downloadFile downloadFileName];
-    cell.urlLabel.text = [downloadFile downloadUrlString];
-    cell.priority = downloadFile.priority;
 
+    DownloadItem *downloadModel = _dowloadModels[indexPath.row];
+    cell.fileName.text = [downloadModel fileName];
+    cell.urlLabel.text = [downloadModel urlString];
+    cell.priority = downloadModel.priority;
+    
     return cell;
 }
 
