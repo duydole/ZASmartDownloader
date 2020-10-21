@@ -8,8 +8,25 @@
 
 #import "DownloadItemTableViewCell.h"
 #import "ZADownloadManager.h"
+#import "UIView+Extension.h"
+#import <UIKit/UIKit.h>
+
+#define SPACING_BETWEEN_LABEL 12
+#define STANDARD_PADDING      12
+#define SMALL_FONT_SIZE       12
+
 
 @interface DownloadItemTableViewCell()
+
+@property (strong, nonatomic) UILabel *fileName;
+@property (strong, nonatomic) UILabel *urlLabel;
+@property (strong, nonatomic) UIProgressView *progressView;
+@property (strong, nonatomic) UIButton *startButton;
+@property (strong, nonatomic) UILabel *downloadedProgressLabel;
+@property (strong, nonatomic) UILabel *speedLabel;
+@property (strong, nonatomic) UILabel *remainingTimeLabel;
+@property (strong, nonatomic) UIButton *cancelButton;
+@property (strong, nonatomic) UILabel *priorityLabel;
 
 @property (nonatomic, strong) ZARequestItem *downloadItem;
 
@@ -33,7 +50,53 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
+    ///Name
+    [self.fileName sizeToFit];
+    self.fileName.frame = CGRectMake(STANDARD_PADDING, STANDARD_PADDING, self.bounds.size.width - STANDARD_PADDING, self.fileName.bounds.size.height);
+    
+    ///Url
+    [self.urlLabel sizeToFit];
+    self.urlLabel.left = self.fileName.left;
+    self.urlLabel.top = self.fileName.bottom + SPACING_BETWEEN_LABEL;
+    self.urlLabel.width = self.fileName.width;
+    
+    ///Speed
+    [self.speedLabel sizeToFit];
+    self.speedLabel.top = self.urlLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.speedLabel.left = self.urlLabel.left;
+    
+    ///RemainTime
+    self.remainingTimeLabel.top = self.speedLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.remainingTimeLabel.left = self.speedLabel.left;
+    
+    ///RemainTime
+    [self.priorityLabel sizeToFit];
+    self.priorityLabel.top = self.remainingTimeLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.priorityLabel.left = self.remainingTimeLabel.left;
+    
+    ///ProgressView
+    self.progressView.top = self.priorityLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.progressView.left = self.priorityLabel.left;
+    self.progressView.width = self.width - 150;
+    
+    ///Cancel
+    self.cancelButton.right = self.width - STANDARD_PADDING;
+    self.cancelButton.bottom = self.height - STANDARD_PADDING;
+    
+    ///Start
+    self.startButton.bottom = self.cancelButton.top - SPACING_BETWEEN_LABEL;
+    self.startButton.right = self.cancelButton.right;
+}
 
+#pragma mark - Update Model
+
+- (void)setDownloadModel:(DownloadItem *)downloadModel {
+    _downloadModel = downloadModel;
+    
+    [self updatePriorityLabel:_downloadModel.priority];
+    self.fileName.text = [downloadModel fileName];
+    self.urlLabel.text = [NSString stringWithFormat:@"URL: %@",[downloadModel urlString]];
 }
 
 #pragma mark - Events
@@ -42,18 +105,14 @@
     /// Tapped to START/PAUSE/RESUME/RETRY button:
 
     if ([self.startButton.titleLabel.text isEqualToString:@"START"]) {
-        // Tapped to START
         self.cancelButton.enabled = true;
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
-        NSString *url = self.urlLabel.text;
-        //NSString *directoryName = @"Downloaded Files";
+        NSString *url = self.downloadModel.urlString;
         NSUInteger retryInterval = 3;
         NSUInteger retryCount = 3;
 
-        // begin downloading:
-        _downloadItem = [ZADownloadManager.sharedInstance downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
-            // inprogress:
-            // NSLog(@"dld: Downloading file: %@ progress: %f",[self.urlLabel.text lastPathComponent], progress);
+        ///Start download:
+        _downloadItem = [ZADownloadManager.sharedInstance downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_downloadModel.priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
             [self.progressView setProgress:progress];
             NSInteger percent = progress*100;
             self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"%ld",(long)percent] stringByAppendingString:@"%"];
@@ -108,11 +167,109 @@
     self.downloadedProgressLabel.text = @"0%";
 }
 
+#pragma mark - Getter/Setter
+
+- (UILabel *)fileName {
+    if (_fileName == nil) {
+        _fileName = [UILabel new];
+        [self.contentView addSubview:_fileName];
+    }
+    
+    return _fileName;
+}
+
+- (UILabel *)urlLabel {
+    if (_urlLabel == nil) {
+        _urlLabel = [UILabel new];
+        _urlLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
+        [self.contentView addSubview:_urlLabel];
+    }
+    
+    return _urlLabel;
+}
+
+- (UILabel *)speedLabel {
+    if (_speedLabel == nil) {
+        _speedLabel = [UILabel new];
+        _speedLabel.text = @"SPEED: ---";
+        _speedLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
+        [self.contentView addSubview:_speedLabel];
+    }
+    
+    return _speedLabel;
+}
+
+- (UILabel *)remainingTimeLabel {
+    if (_remainingTimeLabel == nil) {
+        _remainingTimeLabel = [UILabel new];
+        _remainingTimeLabel.width = self.width - 2*STANDARD_PADDING;
+        _remainingTimeLabel.height = 35;
+        _remainingTimeLabel.text = @"Remaining Time: ---";
+        _remainingTimeLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
+        [self.contentView addSubview:_remainingTimeLabel];
+    }
+    
+    return _remainingTimeLabel;
+}
+
+- (UILabel *)priorityLabel {
+    if (_priorityLabel == nil) {
+        _priorityLabel = [UILabel new];
+        _priorityLabel.text = @"Priority: ---";
+        _priorityLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
+        [self.contentView addSubview:_priorityLabel];
+    }
+    
+    return _priorityLabel;
+}
+
+- (UIProgressView *)progressView {
+    if (_progressView == nil) {
+        _progressView = [UIProgressView new];
+        
+        [self.contentView addSubview:_progressView];
+    }
+    
+    return _progressView;
+}
+
+- (UIButton *)startButton {
+    if (_startButton == nil) {
+        _startButton = [UIButton new];
+        _startButton = [UIButton new];
+        _startButton.width = 58;
+        _startButton.height = 28;
+        _startButton.backgroundColor = UIColor.systemBlueColor;
+        _startButton.layer.cornerRadius = 5.0;
+        _startButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_startButton setTitle:@"START" forState:UIControlStateNormal];
+        [_startButton addTarget:self action:@selector(tappedStartButton:) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:_startButton];
+    }
+    
+    return _startButton;
+}
+
+- (UIButton *)cancelButton {
+    if (_cancelButton == nil) {
+        _cancelButton = [UIButton new];
+        _cancelButton.width = 58;
+        _cancelButton.height = 28;
+        _cancelButton.backgroundColor = UIColor.systemBlueColor;
+        _cancelButton.layer.cornerRadius = 5.0  ;
+        _cancelButton.titleLabel.font = [UIFont systemFontOfSize:13];
+        [_cancelButton setTitle:@"CANCEL" forState:UIControlStateNormal];
+        [_cancelButton addTarget:self action:@selector(cancelDownload:) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:_cancelButton];
+    }
+    
+    return _cancelButton;
+}
+
 #pragma mark - Others
 
-- (void)setPriority:(ZADownloadModelPriroity)priority {
-    _priority = priority;
-    switch (self.priority) {
+- (void)updatePriorityLabel:(ZADownloadModelPriroity)priority {
+    switch (priority) {
         case ZADownloadModelPriroityLow:
             self.priorityLabel.text = @"Priority: LOW";
             break;

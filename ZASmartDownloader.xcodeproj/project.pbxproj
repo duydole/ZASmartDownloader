@@ -22,6 +22,7 @@
 		F227D25D253FFD2400D83ED4 /* DownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25C253FFD2400D83ED4 /* DownloadItem.m */; };
 		F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25F2540048D00D83ED4 /* ZADownloadManager.m */; };
 		F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */; };
+		F24830A42540880400539EAF /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24830A32540880400539EAF /* UIView+Extension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,8 @@
 		F227D25F2540048D00D83ED4 /* ZADownloadManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZADownloadManager.m; sourceTree = "<group>"; };
 		F248309E25407F2100539EAF /* DownloadItemTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DownloadItemTableViewCell.h; sourceTree = "<group>"; };
 		F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloadItemTableViewCell.m; sourceTree = "<group>"; };
+		F24830A22540880400539EAF /* UIView+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Extension.h"; sourceTree = "<group>"; };
+		F24830A32540880400539EAF /* UIView+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +134,7 @@
 		EC4DF10022CC9E8A0049DBFF /* ZASmartDownloader */ = {
 			isa = PBXGroup;
 			children = (
+				F24830A1254087E500539EAF /* Extensions */,
 				F227D25A253FFD0C00D83ED4 /* Entities */,
 				ECB2EE3C22CCAB5800BCB30E /* ZADownloadManager */,
 				ECB2EE3822CCA00700BCB30E /* TableViewCell */,
@@ -197,6 +201,15 @@
 				F227D25C253FFD2400D83ED4 /* DownloadItem.m */,
 			);
 			path = Entities;
+			sourceTree = "<group>";
+		};
+		F24830A1254087E500539EAF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F24830A22540880400539EAF /* UIView+Extension.h */,
+				F24830A32540880400539EAF /* UIView+Extension.m */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -336,6 +349,7 @@
 			files = (
 				E107F1E822E89715003194B9 /* ZARequestItem.m in Sources */,
 				F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */,
+				F24830A42540880400539EAF /* UIView+Extension.m in Sources */,
 				F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */,
 				EC4DF10622CC9E8A0049DBFF /* ViewController.m in Sources */,
 				E134592822DE1A58001143AC /* ZAImageCache.m in Sources */,

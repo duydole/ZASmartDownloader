@@ -8,22 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "ZARequestItem.h"
+#import "DownloadItem.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DownloadItemTableViewCell : UITableViewCell
 
-@property (weak, nonatomic) UILabel *fileName;
-@property (weak, nonatomic) UILabel *urlLabel;
-@property (weak, nonatomic) UIProgressView *progressView;
-@property (weak, nonatomic) UIButton *startButton;
-@property (weak, nonatomic) UILabel *downloadedProgressLabel;
-@property (weak, nonatomic) UILabel *speedLabel;
-@property (weak, nonatomic) UILabel *remainingTimeLabel;
-@property (weak, nonatomic) UIButton *cancelButton;
-@property (weak, nonatomic) UILabel *priorityLabel;
-
-@property (assign, nonatomic) ZADownloadModelPriroity priority;
+@property (nonatomic, strong) DownloadItem *downloadModel;
 
 @end
 

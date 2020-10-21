@@ -14,7 +14,7 @@
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
 
-@property (strong, nonatomic) UITableView                               *downloaderTableView;
+@property (strong, nonatomic) UITableView                             *downloaderTableView;
 @property (strong, nonatomic) NSMutableArray<DownloadItem *>        *dowloadModels;
 
 @end
@@ -33,6 +33,7 @@
     [_downloaderTableView registerClass:DownloadItemTableViewCell.class forCellReuseIdentifier:kDownloadTableViewCellId];
     _downloaderTableView.dataSource = self;
     _downloaderTableView.delegate = self;
+    [self.view addSubview:_downloaderTableView];
     
     // setup DownloadManager
     ZADownloadManager.sharedInstance.maxConcurrentDownloads = 1;        // maximum concurrent downloads.
@@ -52,15 +53,19 @@
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString6, @"CHROME", ZADownloadModelPriroityLow)];
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    
+    _downloaderTableView.frame = self.view.bounds;
+}
+
 #pragma mark - UITableView DataSource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DownloadItemTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kDownloadTableViewCellId forIndexPath:indexPath];
 
     DownloadItem *downloadModel = _dowloadModels[indexPath.row];
-    cell.fileName.text = [downloadModel fileName];
-    cell.urlLabel.text = [downloadModel urlString];
-    cell.priority = downloadModel.priority;
+    cell.downloadModel = downloadModel;
     
     return cell;
 }
