@@ -1,7 +1,7 @@
 #import "ViewController.h"
-#import "DowloaderTableViewCell.h"
 #import "ZADownloadManager.h"
 #import "DownloadItem.h"
+#import "DownloadItemTableViewCell.h"
 
 #define urlString1 @"https://manuals.info.apple.com/MANUALS/1000/MA1565/en_US/iphone_user_guide.pdf"
 #define urlString2 @"https://az764295.vo.msecnd.net/stable/c7d83e57cd18f18026a8162d042843bda1bcf21f/VSCode-darwin-stable.zip"
@@ -10,9 +10,11 @@
 #define urlString5 @"https://download.skype.com/s4l/download/mac/Skype-8.49.0.49.dmg"
 #define urlString6 @"https://dl.google.com/chrome/mac/stable/CHFA/googlechrome.dmg"
 
+#define kDownloadTableViewCellId @"kDownloadTableViewCellId"
+
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
 
-@property (weak, nonatomic) IBOutlet UITableView                     *downloaderTableView;
+@property (strong, nonatomic) UITableView                               *downloaderTableView;
 @property (strong, nonatomic) NSMutableArray<DownloadItem *>        *dowloadModels;
 
 @end
@@ -22,12 +24,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self setup];
+    [self setupviews];
     [self setupFakeData];
 }
 
-- (void)setup {
-    _dowloadModels = [[NSMutableArray alloc] init];
+- (void)setupviews {
+    _downloaderTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    [_downloaderTableView registerClass:DownloadItemTableViewCell.class forCellReuseIdentifier:kDownloadTableViewCellId];
     _downloaderTableView.dataSource = self;
     _downloaderTableView.delegate = self;
     
@@ -36,7 +39,8 @@
 }
 
 - (void)setupFakeData {
-    
+    _dowloadModels = [NSMutableArray new];
+
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 1", ZADownloadModelPriroityHigh)];
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 2", ZADownloadModelPriroityMedium)];
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString1, @"APPLE DOCS - BUSINESS 3", ZADownloadModelPriroityLow)];
@@ -51,7 +55,7 @@
 #pragma mark - UITableView DataSource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    DowloaderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellId" forIndexPath:indexPath];
+    DownloadItemTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kDownloadTableViewCellId forIndexPath:indexPath];
 
     DownloadItem *downloadModel = _dowloadModels[indexPath.row];
     cell.fileName.text = [downloadModel fileName];

@@ -1,51 +1,53 @@
-#import "DowloaderTableViewCell.h"
+//
+//  DownloadItemTableViewCell.m
+//  ZASmartDownloader
+//
+//  Created by Do Le Duy on 10/21/20.
+//  Copyright © 2020 vng. All rights reserved.
+//
+
+#import "DownloadItemTableViewCell.h"
 #import "ZADownloadManager.h"
 
-@interface DowloaderTableViewCell()
+@interface DownloadItemTableViewCell()
 
-@property ZARequestItem *downloadItem;
+@property (nonatomic, strong) ZARequestItem *downloadItem;
 
 @end
 
-@implementation DowloaderTableViewCell
+@implementation DownloadItemTableViewCell
 
-- (void) awakeFromNib {
-    [super awakeFromNib];
-    [self.progressView setProgress:0];
-    self.downloadedProgressLabel.text = @"0%";
-    self.cancelButton.enabled = false;
-}
-
-- (void) setPriority:(ZADownloadModelPriroity)priority {
-    _priority = priority;
-    switch (self.priority) {
-        case ZADownloadModelPriroityLow:
-            self.priorityLabel.text = @"Priority: LOW";
-            break;
-        case ZADownloadModelPriroityMedium:
-            self.priorityLabel.text = @"Priority: MEDIUM";
-            break;
-        case ZADownloadModelPriroityHigh:
-            self.priorityLabel.text = @"Priority: HIGH";
-            break;
-        default:
-            break;
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self setupSubViews];
     }
+    return self;
 }
 
-- (void) setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+- (void)setupSubViews {
+    
 }
 
-// Tapped to START/PAUSE/RESUME/RETRY button:
-- (IBAction) tappedStartButton:(id) sender {
+#pragma mark - Layout Subviews
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+}
+
+#pragma mark - Events
+
+- (void)tappedStartButton:(id)sender {
+    /// Tapped to START/PAUSE/RESUME/RETRY button:
+
     if ([self.startButton.titleLabel.text isEqualToString:@"START"]) {
         // Tapped to START
         self.cancelButton.enabled = true;
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         NSString *url = self.urlLabel.text;
         //NSString *directoryName = @"Downloaded Files";
-        NSUInteger retryInterval = 3;       
+        NSUInteger retryInterval = 3;
         NSUInteger retryCount = 3;
 
         // begin downloading:
@@ -93,8 +95,8 @@
     }
 }
 
-// Tapped CANCEL button:
-- (IBAction) cancelDownload:(id)sender {
+- (void)cancelDownload:(id)sender {
+    // Tapped CANCEL button
     
     [ZADownloadManager.sharedInstance cancelDownloadingOfRequest:self.downloadItem];
     
@@ -106,7 +108,30 @@
     self.downloadedProgressLabel.text = @"0%";
 }
 
-- (void) showAlertViewWithCode: (DownloadErrorCode) errorCode {
+#pragma mark - Others
+
+- (void)setPriority:(ZADownloadModelPriroity)priority {
+    _priority = priority;
+    switch (self.priority) {
+        case ZADownloadModelPriroityLow:
+            self.priorityLabel.text = @"Priority: LOW";
+            break;
+        case ZADownloadModelPriroityMedium:
+            self.priorityLabel.text = @"Priority: MEDIUM";
+            break;
+        case ZADownloadModelPriroityHigh:
+            self.priorityLabel.text = @"Priority: HIGH";
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+}
+
+- (void)showAlertViewWithCode: (DownloadErrorCode) errorCode {
     NSString *alertContent;
     switch (errorCode) {
         case DownloadErrorCodeLossConnection:
@@ -126,7 +151,7 @@
     [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alertView animated:NO completion:nil];
 }
 
-- (void) logErrorWithCode: (DownloadErrorCode) errorCode {
+- (void)logErrorWithCode: (DownloadErrorCode) errorCode {
     switch (errorCode) {
         case DownloadErrorCodeLossConnection:
             [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];

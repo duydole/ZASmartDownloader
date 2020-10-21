@@ -18,10 +18,10 @@
 		EC4DF11122CC9E8A0049DBFF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11022CC9E8A0049DBFF /* main.m */; };
 		EC4DF11B22CC9E8B0049DBFF /* ZASmartDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11A22CC9E8B0049DBFF /* ZASmartDownloaderTests.m */; };
 		EC4DF12622CC9E8B0049DBFF /* ZASmartDownloaderUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF12522CC9E8B0049DBFF /* ZASmartDownloaderUITests.m */; };
-		ECB2EE3B22CCA02000BCB30E /* DowloaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE3A22CCA02000BCB30E /* DowloaderTableViewCell.m */; };
 		ECB2EE4222CCAB6900BCB30E /* ZACommonDownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */; };
 		F227D25D253FFD2400D83ED4 /* DownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25C253FFD2400D83ED4 /* DownloadItem.m */; };
 		F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25F2540048D00D83ED4 /* ZADownloadManager.m */; };
+		F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,14 +64,14 @@
 		EC4DF12122CC9E8B0049DBFF /* ZASmartDownloaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZASmartDownloaderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4DF12522CC9E8B0049DBFF /* ZASmartDownloaderUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZASmartDownloaderUITests.m; sourceTree = "<group>"; };
 		EC4DF12722CC9E8B0049DBFF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		ECB2EE3922CCA02000BCB30E /* DowloaderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DowloaderTableViewCell.h; sourceTree = "<group>"; };
-		ECB2EE3A22CCA02000BCB30E /* DowloaderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DowloaderTableViewCell.m; sourceTree = "<group>"; };
 		ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZACommonDownloadItem.h; sourceTree = "<group>"; };
 		ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZACommonDownloadItem.m; sourceTree = "<group>"; };
 		F227D25B253FFD2400D83ED4 /* DownloadItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DownloadItem.h; sourceTree = "<group>"; };
 		F227D25C253FFD2400D83ED4 /* DownloadItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloadItem.m; sourceTree = "<group>"; };
 		F227D25E2540048D00D83ED4 /* ZADownloadManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZADownloadManager.h; sourceTree = "<group>"; };
 		F227D25F2540048D00D83ED4 /* ZADownloadManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZADownloadManager.m; sourceTree = "<group>"; };
+		F248309E25407F2100539EAF /* DownloadItemTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DownloadItemTableViewCell.h; sourceTree = "<group>"; };
+		F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloadItemTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,8 +168,8 @@
 		ECB2EE3822CCA00700BCB30E /* TableViewCell */ = {
 			isa = PBXGroup;
 			children = (
-				ECB2EE3922CCA02000BCB30E /* DowloaderTableViewCell.h */,
-				ECB2EE3A22CCA02000BCB30E /* DowloaderTableViewCell.m */,
+				F248309E25407F2100539EAF /* DownloadItemTableViewCell.h */,
+				F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */,
 			);
 			path = TableViewCell;
 			sourceTree = "<group>";
@@ -336,6 +336,7 @@
 			files = (
 				E107F1E822E89715003194B9 /* ZARequestItem.m in Sources */,
 				F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */,
+				F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */,
 				EC4DF10622CC9E8A0049DBFF /* ViewController.m in Sources */,
 				E134592822DE1A58001143AC /* ZAImageCache.m in Sources */,
 				E1156F1022E052980056D8FB /* Reachability.m in Sources */,
@@ -343,7 +344,6 @@
 				EC4DF11122CC9E8A0049DBFF /* main.m in Sources */,
 				EC4DF10322CC9E8A0049DBFF /* AppDelegate.m in Sources */,
 				ECB2EE4222CCAB6900BCB30E /* ZACommonDownloadItem.m in Sources */,
-				ECB2EE3B22CCA02000BCB30E /* DowloaderTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
