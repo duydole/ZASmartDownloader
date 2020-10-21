@@ -15,12 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype) sharededInstance;
 
-// store a UIImage with Identifer in Cache.
-- (void) storeImage: (UIImage*)image
-               byId: (NSString*)imageId;
+- (void)storeImage:(UIImage *)image byId: (NSString *)imageId;
 
-// get UIImage in cache by Identifier.
-- (UIImage*) getImageById: (NSString*)imageId;
+- (UIImage *)getImageById:(NSString *)imageId;
 
 @end
 

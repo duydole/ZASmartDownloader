@@ -17,7 +17,7 @@
 
 @implementation DownloadedImageCache
 
-+ (instancetype) sharededInstance {
++ (instancetype)sharededInstance {
     static DownloadedImageCache *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -26,7 +26,7 @@
     return sharedInstance;
 }
 
-- (instancetype) init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         [self setup];
@@ -34,21 +34,21 @@
     return self;
 }
 
-- (void) setup {
+- (void)setup {
     _imageCache = [[NSCache alloc] init];
     _maxMemory = 10*1024*1024;                  // 10Mb
     _imageCache.totalCostLimit = _maxMemory;
 }
 
-- (void) storeImage:(UIImage *)image
-               byId:(NSString *)imageId {
+- (void)storeImage:(UIImage *)image
+              byId:(NSString *)imageId {
     if (image && imageId) {
         NSUInteger imageSize = CGImageGetHeight(image.CGImage)*CGImageGetWidth(image.CGImage);
         [_imageCache setObject:image forKey:imageId cost:imageSize];
     }
 }
 
-- (UIImage *) getImageById:(NSString *)imageId {
+- (UIImage *)getImageById:(NSString *)imageId {
     return [_imageCache objectForKey:imageId];
 }
 

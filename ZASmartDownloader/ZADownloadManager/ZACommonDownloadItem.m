@@ -18,27 +18,16 @@
     return self;
 }
 
-# pragma mark - private methods:
-- (void) setRetryCount:(NSUInteger)retryCount {
-    _retryCount = retryCount;
-    if (_maxRetryCount == 0) {
-        _maxRetryCount = retryCount;
-    }
-}
+# pragma mark - Control item
 
-- (void) resetRetryCount {
-    _retryCount = _maxRetryCount;
-}
-
-# pragma mark - control item
-- (void) startDownloadingAllRequests {
+- (void)startDownloadingAllRequests {
     for (NSString *identifier in self.requestItemsDict) {
         [self startDownloadingRequest:identifier];
     }
     [_commonDownloadTask resume];
 }
 
-- (void) startDownloadingRequest:(NSString *)requestId {
+- (void)startDownloadingRequest:(NSString *)requestId {
     
     ZARequestItem *requestItem = [_requestItemsDict objectForKey:requestId];
     
@@ -55,7 +44,7 @@
     }
 }
 
-- (void) startAllPendingRequestItems {
+- (void)startAllPendingRequestItems {
     
     _totalDownloadingSubItems = _requestItemsDict.allValues.count;
     
@@ -68,13 +57,13 @@
     [_commonDownloadTask resume];
 }
 
-- (void) pauseAlls {
+- (void)pauseAlls {
     for (NSString *identifier in self.requestItemsDict) {
         [self pauseDownloadingWithRequestId:identifier];
     }
 }
 
-- (void) pauseDownloadingWithRequestId:(NSString *) identifier {
+- (void)pauseDownloadingWithRequestId:(NSString *) identifier {
     // pause logic:
     ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
     downloadItem.state = ZADownloadItemStatePaused;
@@ -92,7 +81,7 @@
 }
 
 // resume a Paused DownloadItem with Id and Session (which used to create DownloadTask)
-- (void) resumeDownloadingWithRequestId:(NSString *)identifier urlSession:(NSURLSession *)session {
+- (void)resumeDownloadingWithRequestId:(NSString *)identifier urlSession:(NSURLSession *)session {
     
     ZARequestItem *requestItem = [_requestItemsDict objectForKey:identifier];
     if (!requestItem) {
@@ -153,7 +142,7 @@
     }
 }
 
-- (void) cancelDownloadingWithRequestId:(NSString *)identifier {
+- (void)cancelDownloadingWithRequestId:(NSString *)identifier {
 
     ZARequestItem *downloadItem = [_requestItemsDict objectForKey:identifier];
     
@@ -169,20 +158,33 @@
     }
 }
 
-- (void) addRequestItem:(ZARequestItem *)requestItem {
+- (void)addRequestItem:(ZARequestItem *)requestItem {
     if (requestItem.state == ZADownloadItemStateDownloading) {
         _totalDownloadingSubItems++;
     }
     [_requestItemsDict setObject:requestItem forKey:requestItem.requestId];
 }
 
-- (void) removeARequestItem:(ZARequestItem *)requestItem {
+- (void)removeARequestItem:(ZARequestItem *)requestItem {
     // if remove a Downloading Request Item and it is existed in Dict.
     if ((requestItem.state == ZADownloadItemStateDownloading) && [_requestItemsDict objectForKey:requestItem.requestId]) {
         _totalDownloadingSubItems--;
     }
     
     [_requestItemsDict removeObjectForKey:requestItem.requestId];
+}
+
+# pragma mark - Private methods:
+
+- (void)setRetryCount:(NSUInteger)retryCount {
+    _retryCount = retryCount;
+    if (_maxRetryCount == 0) {
+        _maxRetryCount = retryCount;
+    }
+}
+
+- (void)resetRetryCount {
+    _retryCount = _maxRetryCount;
 }
 
 @end
