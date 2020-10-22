@@ -10,50 +10,43 @@
 #import "AppDelegate.h"
 #import "ZAImageCache.h"
 #import "Reachability.h"
+#import "LDCommonMacros.h"
 
 #define IMAGE_DIRECTORY_NAME @"Downloaded Images"
 #define DEFAUL_DOWNLOADED_DIRECTORY_NAME @"Downloaded Files"
 #define TIMEOUT_INTERVAL_FOR_REQUEST 10
 
-
 @interface ZADownloadManager() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
-@property (nonatomic) Reachability *internetReachability;                       // internet Reachability.
-@property (nonatomic) NSUInteger totalDownloadingUrls;                          // total downlading urls
+@property (nonatomic, strong) Reachability *internetReachability;                       // internet Reachability.
+@property (nonatomic, assign) NSUInteger totalDownloadingUrls;                          // total downlading urls
 
 // directory:
-@property (nonatomic) NSURL *temporatyDirectoryUrl;                             // default directory for storing TEMP FILES.
-@property (nonatomic) NSURL *defaultDownloadedFilesDirectoryUrl;                // default directory for storing downloaded files.
+@property (nonatomic, strong) NSURL *temporatyDirectoryUrl;                             // default directory for storing TEMP FILES.
+@property (nonatomic, strong) NSURL *defaultDownloadedFilesDirectoryUrl;                // default directory for storing downloaded files.
 
 // 2 URL Sessions.
-@property (nonatomic) NSURLSession *forcegroundURLSession;                      // manage downloadtasks on forceground.
-@property (nonatomic) NSURLSession *backgroundURLSession;                       // manage downloadtasks in background.
+@property (nonatomic, strong) NSURLSession *forcegroundURLSession;                      // manage downloadtasks on forceground.
+@property (nonatomic, strong) NSURLSession *backgroundURLSession;                       // manage downloadtasks in background.
 
 // 2 queue
-@property (nonatomic) dispatch_queue_t fileDownloaderSerialQueue;               // serial queue.
-@property (nonatomic) dispatch_queue_t fileDownloaderConcurrentQueue;           // concurrent queue.
+@property (nonatomic, strong) dispatch_queue_t fileDownloaderSerialQueue;               // serial queue.
+@property (nonatomic, strong) dispatch_queue_t fileDownloaderConcurrentQueue;           // concurrent queue.
 
 // store Dictionary of <UrlString, CommonDownloadItem>
-@property (nonatomic) NSMutableDictionary *backgroundDownloadItemsDict;         // background DownloadItems.
-@property (nonatomic) NSMutableDictionary *foregroundDownloadItemsDict;         // foreground DownloadItems.
+@property (nonatomic, strong) NSMutableDictionary *backgroundDownloadItemsDict;         // background DownloadItems.
+@property (nonatomic, strong) NSMutableDictionary *foregroundDownloadItemsDict;         // foreground DownloadItems.
 
 // Store array of Common DownloadItem in Queue.
-@property (nonatomic) NSMutableArray *highPriorityDownloadItems;
-@property (nonatomic) NSMutableArray *mediumPriorityDownloadItems;
-@property (nonatomic) NSMutableArray *lowPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray *highPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray *mediumPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray *lowPriorityDownloadItems;
 
 @end
 
 @implementation ZADownloadManager
 
-+ (instancetype)sharedInstance {
-    static ZADownloadManager *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
-    });
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 - (instancetype)init {
     self = [super init];
@@ -82,13 +75,13 @@
     _fileDownloaderConcurrentQueue = dispatch_queue_create("duydl.DownloadManager.ConcurrentQueue", DISPATCH_QUEUE_CONCURRENT);
     
     // priority lists:
-    _highPriorityDownloadItems = [[NSMutableArray alloc] init];
-    _mediumPriorityDownloadItems = [[NSMutableArray alloc] init];
+    _highPriorityDownloadItems = [NSMutableArray new];
+    _mediumPriorityDownloadItems = [NSMutableArray new];
     _lowPriorityDownloadItems = [[NSMutableArray alloc] init];
     
     // downloadItems dict:
-    _backgroundDownloadItemsDict = [[NSMutableDictionary alloc] init];
-    _foregroundDownloadItemsDict = [[NSMutableDictionary alloc] init];
+    _backgroundDownloadItemsDict = [NSMutableDictionary new];
+    _foregroundDownloadItemsDict = [NSMutableDictionary new];
 }
 
 - (NSURLSession*)backgroundURLSession {
@@ -351,7 +344,7 @@
     }
     
     // download by ZAFileDownloader
-    [ZADownloadManager.sharedInstance downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
         
         // load image
         UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
@@ -423,8 +416,9 @@
     });
 }
 
-// retry download of 1 REQUEST ITEM:
 - (void)retryDownloadingOfRequestItem:(ZARequestItem *)requestItem {
+    /// retry download of 1 REQUEST ITEM:
+
     // 1. Get CommonDownloadItem will be Retry.
     ZACommonDownloadItem *downloadItem = nil;
     if (requestItem.backgroundMode) {
@@ -446,7 +440,6 @@
     }
 }
 
-// retry download
 - (void)retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem
                                withUrlString:(NSString *)urlString {
     
@@ -480,7 +473,6 @@
         [commonDownloadItem startDownloadingAllRequests];
     }
 }
-
 
 - (void)cancelDownloadingOfRequest:(ZARequestItem *)requestItem {
     

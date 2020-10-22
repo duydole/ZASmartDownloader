@@ -24,7 +24,6 @@
 @property (strong, nonatomic) UIProgressView *progressView;
 @property (strong, nonatomic) UIButton *startButton;
 @property (strong, nonatomic) UILabel *downloadedProgressLabel;
-@property (strong, nonatomic) UILabel *speedLabel;
 @property (strong, nonatomic) UILabel *remainingTimeLabel;
 @property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UILabel *priorityLabel;
@@ -112,7 +111,7 @@
         NSUInteger retryCount = 3;
 
         ///Start download:
-        _downloadItem = [ZADownloadManager.sharedInstance downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_downloadModel.priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
+        _downloadItem = [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_downloadModel.priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
             [self.progressView setProgress:progress];
             NSInteger percent = progress*100;
             self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"DOWNLOADED: %ld",(long)percent] stringByAppendingString:@"%"];
@@ -134,7 +133,7 @@
 
     } else if ([self.startButton.titleLabel.text isEqualToString:@"PAUSE"]){
         // Tapped to PAUSE:
-        [ZADownloadManager.sharedInstance pauseDownloadingOfRequest:_downloadItem];
+        [ZADownloadManager.sharedZADownloadManager pauseDownloadingOfRequest:_downloadItem];
         [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];
         //NSLog(@"dld: tapped PAUSE, now you can tap button RESUME");
         
@@ -142,14 +141,14 @@
         
     } else if ([self.startButton.titleLabel.text isEqualToString:@"RESUME"]){
         // Tapped to RESUME
-        [ZADownloadManager.sharedInstance resumeDownloadingOfRequest:_downloadItem];
+        [ZADownloadManager.sharedZADownloadManager resumeDownloadingOfRequest:_downloadItem];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         //NSLog(@"dld: tapped RESUME, now you can tap button PAUSE");
         
         
     } else if ([self.startButton.titleLabel.text isEqualToString:@"RETRY"]) {
         // Tapped to RETRY
-        [ZADownloadManager.sharedInstance retryDownloadingOfRequestItem:self.downloadItem];
+        [ZADownloadManager.sharedZADownloadManager retryDownloadingOfRequestItem:self.downloadItem];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
     }
 }
@@ -157,7 +156,7 @@
 - (void)cancelDownload:(id)sender {
     // Tapped CANCEL button
     
-    [ZADownloadManager.sharedInstance cancelDownloadingOfRequest:self.downloadItem];
+    [ZADownloadManager.sharedZADownloadManager cancelDownloadingOfRequest:self.downloadItem];
     
     [self.startButton setTitle:@"START" forState:UIControlStateNormal];
     self.cancelButton.enabled = false;
@@ -286,11 +285,7 @@
     }
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-}
-
-- (void)showAlertViewWithCode: (DownloadErrorCode) errorCode {
+- (void)showAlertViewWithCode:(DownloadErrorCode)errorCode {
     NSString *alertContent;
     switch (errorCode) {
         case DownloadErrorCodeLossConnection:
@@ -310,7 +305,7 @@
     [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alertView animated:NO completion:nil];
 }
 
-- (void)logErrorWithCode: (DownloadErrorCode) errorCode {
+- (void)logErrorWithCode:(DownloadErrorCode)errorCode {
     switch (errorCode) {
         case DownloadErrorCodeLossConnection:
             [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];

@@ -14,8 +14,8 @@
             filePath = "ZASmartDownloader/TableViewCell/DownloadItemTableViewCell.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
+            startingLineNumber = "327"
+            endingLineNumber = "327"
             landmarkName = "-logErrorWithCode:"
             landmarkType = "7">
          </BreakpointContent>

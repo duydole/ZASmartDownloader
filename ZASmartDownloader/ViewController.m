@@ -28,6 +28,8 @@
     [self setupFakeData];
 }
 
+#pragma mark - Setup
+
 - (void)setupviews {
     _downloaderTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     [_downloaderTableView registerClass:DownloadItemTableViewCell.class forCellReuseIdentifier:kDownloadTableViewCellId];
@@ -36,7 +38,7 @@
     [self.view addSubview:_downloaderTableView];
     
     // setup DownloadManager
-    ZADownloadManager.sharedInstance.maxConcurrentDownloads = 1;        // maximum concurrent downloads.
+    ZADownloadManager.sharedZADownloadManager.maxConcurrentDownloads = 1;        // maximum concurrent downloads.
 }
 
 - (void)setupFakeData {
@@ -52,6 +54,8 @@
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString5, @"SKYPE", ZADownloadModelPriroityMedium)];
     [_dowloadModels addObject:CREATE_DOWNLOADITEM(urlString6, @"CHROME", ZADownloadModelPriroityLow)];
 }
+
+#pragma mark - Layout
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];

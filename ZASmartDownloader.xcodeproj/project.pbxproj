@@ -75,6 +75,7 @@
 		F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloadItemTableViewCell.m; sourceTree = "<group>"; };
 		F24830A22540880400539EAF /* UIView+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Extension.h"; sourceTree = "<group>"; };
 		F24830A32540880400539EAF /* UIView+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
+		F24F4F8D2541535E00DFC2CF /* LDCommonMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDCommonMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,10 +135,8 @@
 		EC4DF10022CC9E8A0049DBFF /* ZASmartDownloader */ = {
 			isa = PBXGroup;
 			children = (
-				F24830A1254087E500539EAF /* Extensions */,
-				F227D25A253FFD0C00D83ED4 /* Entities */,
-				ECB2EE3C22CCAB5800BCB30E /* ZADownloadManager */,
-				ECB2EE3822CCA00700BCB30E /* TableViewCell */,
+				F24F4F872541517300DFC2CF /* Business */,
+				F24F4F832541515D00DFC2CF /* Presentations */,
 				EC4DF10122CC9E8A0049DBFF /* AppDelegate.h */,
 				EC4DF10222CC9E8A0049DBFF /* AppDelegate.m */,
 				EC4DF10422CC9E8A0049DBFF /* ViewController.h */,
@@ -181,26 +180,14 @@
 		ECB2EE3C22CCAB5800BCB30E /* ZADownloadManager */ = {
 			isa = PBXGroup;
 			children = (
+				F24F4F88254151A100DFC2CF /* Entities */,
 				E1156F0D22E0528D0056D8FB /* Reachability */,
-				E107F1E622E89715003194B9 /* ZARequestItem.h */,
-				E107F1E722E89715003194B9 /* ZARequestItem.m */,
-				ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */,
-				ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */,
 				E134592722DE1A58001143AC /* ZAImageCache.h */,
 				E134592622DE1A58001143AC /* ZAImageCache.m */,
 				F227D25E2540048D00D83ED4 /* ZADownloadManager.h */,
 				F227D25F2540048D00D83ED4 /* ZADownloadManager.m */,
 			);
 			path = ZADownloadManager;
-			sourceTree = "<group>";
-		};
-		F227D25A253FFD0C00D83ED4 /* Entities */ = {
-			isa = PBXGroup;
-			children = (
-				F227D25B253FFD2400D83ED4 /* DownloadItem.h */,
-				F227D25C253FFD2400D83ED4 /* DownloadItem.m */,
-			);
-			path = Entities;
 			sourceTree = "<group>";
 		};
 		F24830A1254087E500539EAF /* Extensions */ = {
@@ -210,6 +197,45 @@
 				F24830A32540880400539EAF /* UIView+Extension.m */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F24F4F832541515D00DFC2CF /* Presentations */ = {
+			isa = PBXGroup;
+			children = (
+				F24830A1254087E500539EAF /* Extensions */,
+				ECB2EE3822CCA00700BCB30E /* TableViewCell */,
+			);
+			path = Presentations;
+			sourceTree = "<group>";
+		};
+		F24F4F872541517300DFC2CF /* Business */ = {
+			isa = PBXGroup;
+			children = (
+				F24F4F8C2541532E00DFC2CF /* Common */,
+				ECB2EE3C22CCAB5800BCB30E /* ZADownloadManager */,
+			);
+			path = Business;
+			sourceTree = "<group>";
+		};
+		F24F4F88254151A100DFC2CF /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				E107F1E622E89715003194B9 /* ZARequestItem.h */,
+				E107F1E722E89715003194B9 /* ZARequestItem.m */,
+				F227D25B253FFD2400D83ED4 /* DownloadItem.h */,
+				F227D25C253FFD2400D83ED4 /* DownloadItem.m */,
+				ECB2EE4022CCAB6900BCB30E /* ZACommonDownloadItem.h */,
+				ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		F24F4F8C2541532E00DFC2CF /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				F24F4F8D2541535E00DFC2CF /* LDCommonMacros.h */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

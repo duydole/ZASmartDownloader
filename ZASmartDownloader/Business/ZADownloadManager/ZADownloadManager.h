@@ -15,7 +15,7 @@ typedef NSString* DownloadRequestId;
 
 @interface ZADownloadManager : NSObject
 
-+ (instancetype)sharedInstance;
++ (ZADownloadManager*)sharedZADownloadManager;
 
 /// Maximum Concurrent downloadTasks
 /// Defautl: maxConcurrentDownloads = -1, no limit the concurrent downloadtasks.
