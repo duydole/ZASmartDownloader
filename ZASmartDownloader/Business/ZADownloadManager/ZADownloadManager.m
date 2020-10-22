@@ -469,14 +469,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     });
 }
 
-- (NSURL *)getDefaultDownloadedFileDirectoryUrl {
-    return DOCUMENT_URL;
-}
-
-- (NSURL *)getDefaultDownloadedImageDirectoryUrl {
-    return [DOCUMENT_URL URLByAppendingPathComponent:IMAGE_DIRECTORY_NAME];
-}
-
 # pragma mark - NSURLSessionDelegate implementation
 
 // notify progress when downloading.
@@ -785,14 +777,6 @@ didCompleteWithError:(NSError *)error {
     //    }
 }
 
-- (NSUInteger)numberOfDownloadingUrls {
-    __block NSUInteger total;
-    dispatch_sync(_serialQueue, ^{
-        total = self.totalDownloadingUrls;
-    });
-    return total;
-}
-
 - (void)removeAWaitingDownloadItem:(ZACommonDownloadItem*)downloadItem {
     switch (downloadItem.commonPriority) {
         case ZADownloadModelPriroityHigh:
@@ -856,9 +840,7 @@ didCompleteWithError:(NSError *)error {
     [fileManager createDirectoryAtURL:[DOCUMENT_URL URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
 }
 
-- (BOOL)isExistedFileName:(NSString *)fileName
-              inDirectory:(NSURL *)directoryUrl {
-    
+- (BOOL)isExistedFileName:(NSString *)fileName inDirectory:(NSURL *)directoryUrl {
     NSURL *fileURL;
     
     if (fileName) {
@@ -869,8 +851,7 @@ didCompleteWithError:(NSError *)error {
     return [fileURL checkResourceIsReachableAndReturnError:&error];
 }
 
-- (NSURL *)getFileUrlWithFileName:(NSString *)fileName
-                   directoryName:(NSString *)directoryName {
+- (NSURL *)getFileUrlWithFileName:(NSString *)fileName directoryName:(NSString *)directoryName {
     NSURL *fileUrl;
     if (directoryName) {
         [self createDirectoryWithName:directoryName];

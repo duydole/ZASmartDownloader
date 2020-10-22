@@ -23,12 +23,6 @@ typedef NSString* DownloadRequestId;
 @property (nonatomic, assign) NSUInteger timeoutIntervalForRequest;
 @property (nonatomic, readonly) NSUInteger numberOfDownloadingUrls;
 
-/// Get default directory url, which downloaded files is stored.
-- (NSURL *)getDefaultDownloadedFileDirectoryUrl;
-
-/// Get default directory url, which downloaded images is stored.
-- (NSURL *)getDefaultDownloadedImageDirectoryUrl;
-
 /// Start download a file with item
 /// @param requestItem info of download file.
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem;
