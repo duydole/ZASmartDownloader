@@ -17,25 +17,23 @@
 #define DEFAUL_DOWNLOADED_DIRECTORY_NAME @"Downloaded Files"
 #define TIMEOUT_INTERVAL_FOR_REQUEST 10
 #define NO_LIMIT_CONCURRENT_DOWNLOADS -1
+#define DEFAULT_RETRY_COUNT 3
+#define DEFAULT_RETRY_INTERVAL 10
 
 @interface ZADownloadManager() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
-@property (nonatomic, strong) Reachability *internetReachability;                       // internet Reachability.
-@property (nonatomic, assign) NSUInteger totalDownloadingUrls;                          // total downlading urls
+@property (nonatomic, strong) Reachability *internetReachability;
+@property (nonatomic, assign) NSUInteger totalDownloadingUrls;
 
-// 2 URL Sessions.
-@property (nonatomic, strong) NSURLSession *forcegroundURLSession;                      // manage downloadtasks on forceground.
-@property (nonatomic, strong) NSURLSession *backgroundURLSession;                       // manage downloadtasks in background.
+@property (nonatomic, strong) NSURLSession *forcegroundURLSession;
+@property (nonatomic, strong) NSURLSession *backgroundURLSession;
 
-// 2 queue
-@property (nonatomic, strong) dispatch_queue_t serialQueue;               // serial queue.
-@property (nonatomic, strong) dispatch_queue_t concurrentQueue;           // concurrent queue.
+@property (nonatomic, strong) dispatch_queue_t serialQueue;
+@property (nonatomic, strong) dispatch_queue_t concurrentQueue;
 
-// store Dictionary of <UrlString, CommonDownloadItem>
-@property (nonatomic, strong) NSMutableDictionary *backgroundDownloadItemsDict;         // background DownloadItems.
-@property (nonatomic, strong) NSMutableDictionary *foregroundDownloadItemsDict;         // foreground DownloadItems.
+@property (nonatomic, strong) NSMutableDictionary *backgroundDownloadItemsDict;
+@property (nonatomic, strong) NSMutableDictionary *foregroundDownloadItemsDict;
 
-// Store array of Common DownloadItem in Queue.
 @property (nonatomic, strong) NSMutableArray *highPriorityDownloadItems;
 @property (nonatomic, strong) NSMutableArray *mediumPriorityDownloadItems;
 @property (nonatomic, strong) NSMutableArray *lowPriorityDownloadItems;
@@ -210,8 +208,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem {
     [self downloadFileWithRequestItem:requestItem
-                           retryCount:3
-                        retryInterval:10];
+                           retryCount:DEFAULT_RETRY_COUNT
+                        retryInterval:DEFAULT_RETRY_INTERVAL];
 }
 
 - (ZARequestItem *)downloadFileWithURL:(NSString *)urlString
@@ -223,8 +221,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                              progress:(ZADownloadProgressBlock)progressBlock
                            completion:(ZADownloadCompletionBlock)completionBlock
                               failure:(ZADownloadErrorBlock)errorBlock {
-    // check urlString:
-    if (![self isValidUrl:urlString]) {
+    NSAssert(retryCount >= 0 && retryInterval >= 0, @"");
+    
+    /// Check URLString
+    ifnot ([self isValidUrl:urlString]) {
         if (errorBlock) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeInvalidUrl userInfo:nil];
@@ -234,22 +234,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         return nil;
     }
     
-    // check retryCount:
-    if (retryCount < 0) {
-        retryCount = 0;
+    /// Check DestinationUrl
+    ifnot (destinationUrl) {
+        destinationUrl = [DOCUMENT_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
     }
     
-    // check retryInterval:
-    if (retryInterval < 0) {
-        retryInterval = 0;
-    }
-    
-    // check destinationUrl
-    if (!destinationUrl) {
-        destinationUrl = [[self getDefaultDownloadedFileDirectoryUrl] URLByAppendingPathComponent:[urlString lastPathComponent]];
-    }
-    
-    // create RequestItem (subModel):
+    /// Create RequestItem (subModel):
     ZARequestItem *requestItem = [[ZARequestItem alloc] initWithUrlString:urlString
                                                          isBackgroundMode:backgroundMode
                                                            destinationUrl:destinationUrl
@@ -258,7 +248,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                                                                completion:completionBlock
                                                                   failure:errorBlock];
     
-    // Start to Download:
+    /// Start to Download:
     [self downloadFileWithRequestItem:requestItem retryCount:retryCount retryInterval:retryInterval];
     
     return requestItem;
@@ -274,8 +264,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     [self downloadFileWithURL:urlString
                destinationUrl:nil
          enableBackgroundMode:backgroundMode
-                   retryCount:3
-                retryInterval:10
+                   retryCount:DEFAULT_RETRY_COUNT
+                retryInterval:DEFAULT_RETRY_INTERVAL
                      priority:priority
                      progress:progressBlock
                    completion:completionBlock
@@ -291,19 +281,16 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
          enableBackgroundMode:YES
                      priority:ZADownloadModelPriroityMedium
                      progress:progressBlock
-                   completion:completionBlock failure:errorBlock];
+                   completion:completionBlock
+                      failure:errorBlock];
 }
 
 - (void)downloadImageWithUrl:(NSString *)urlString
                   completion:(void (^)(UIImage *, NSURL *))completionBlock
                      failure:(void (^)(NSError *))errorBlock {
     
-    NSString *directoryName = IMAGE_DIRECTORY_NAME;
-    
-    // check ImageCache:
+    /// Check Image-Cache và return nếu có
     UIImage *cachedImage = [DownloadedImageCache.sharededInstance getImageById:urlString];
-    
-    // if existed in cache:
     if (cachedImage) {
         NSLog(@"dld: existed in Image cache. I'll forward for you.");
         if (completionBlock) {
@@ -312,13 +299,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         return;
     }
     
-    // download by ZAFileDownloader
+    /// Nếu cache không có thì gọi download thôi:
+    NSString *directoryName = IMAGE_DIRECTORY_NAME;
     [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
-        
-        // load image
+        /// Load imageDownload được lên và cache lại:
         UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
         
-        // cache image
+        /// Cache downloadedImage
         if (downloadedImage) {
             [DownloadedImageCache.sharededInstance storeImage:downloadedImage byId:urlString];
             // call back image.
