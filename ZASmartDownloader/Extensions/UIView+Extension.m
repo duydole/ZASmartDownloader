@@ -83,9 +83,6 @@
     self.frame = frame;
 }
 
-/**
- * Return the x coordinate on the screen.
- */
 - (CGFloat)ttScreenX {
     CGFloat x = 0;
     for (UIView* view = self; view; view = view.superview) {
@@ -94,9 +91,6 @@
     return x;
 }
 
-/**
- * Return the y coordinate on the screen.
- */
 - (CGFloat)ttScreenY {
     CGFloat y = 0;
     for (UIView* view = self; view; view = view.superview) {
@@ -236,8 +230,7 @@
 //    return !![window findFirstResponder];
 //}
 
-- (UIImage *)takeSnapshot
-{
+- (UIImage *)takeSnapshot {
     UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 0);
     [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:YES];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -327,6 +320,7 @@
         }
     }
 }
+
 - (void)updateAppearanceChangesIfNeeded {
     UIView *superview = self.superview;
     if (superview) {
@@ -335,6 +329,7 @@
         [superview insertSubview:self atIndex:index];
     }
 }
+
 @end
 
 @implementation CornerCALayer

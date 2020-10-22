@@ -14,6 +14,7 @@
 #define SPACING_BETWEEN_LABEL 12
 #define STANDARD_PADDING      12
 #define SMALL_FONT_SIZE       12
+#define LABEL_HEIGHT          20
 
 
 @interface DownloadItemTableViewCell()
@@ -61,14 +62,13 @@
     self.urlLabel.top = self.fileName.bottom + SPACING_BETWEEN_LABEL;
     self.urlLabel.width = self.fileName.width;
     
-    ///Speed
-    [self.speedLabel sizeToFit];
-    self.speedLabel.top = self.urlLabel.bottom + SPACING_BETWEEN_LABEL;
-    self.speedLabel.left = self.urlLabel.left;
+    ///Downloaded
+    self.downloadedProgressLabel.top = self.urlLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.downloadedProgressLabel.left = self.urlLabel.left;
     
     ///RemainTime
-    self.remainingTimeLabel.top = self.speedLabel.bottom + SPACING_BETWEEN_LABEL;
-    self.remainingTimeLabel.left = self.speedLabel.left;
+    self.remainingTimeLabel.top = self.downloadedProgressLabel.bottom + SPACING_BETWEEN_LABEL;
+    self.remainingTimeLabel.left = self.downloadedProgressLabel.left;
     
     ///RemainTime
     [self.priorityLabel sizeToFit];
@@ -115,7 +115,7 @@
         _downloadItem = [ZADownloadManager.sharedInstance downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_downloadModel.priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
             [self.progressView setProgress:progress];
             NSInteger percent = progress*100;
-            self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"%ld",(long)percent] stringByAppendingString:@"%"];
+            self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"DOWNLOADED: %ld",(long)percent] stringByAppendingString:@"%"];
             self.remainingTimeLabel.text = [[NSString alloc] initWithFormat:@"Remaining time: %lu(s)", remainingSeconds];
         } completion:^(NSURL *destinationUrl) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -164,7 +164,7 @@
     self.startButton.enabled = true;
     [self.progressView setProgress:0];
     self.remainingTimeLabel.text = @"Remaining time: 0(s)";
-    self.downloadedProgressLabel.text = @"0%";
+    self.downloadedProgressLabel.text = @"DOWNLOADED: 0%";
 }
 
 #pragma mark - Getter/Setter
@@ -188,23 +188,25 @@
     return _urlLabel;
 }
 
-- (UILabel *)speedLabel {
-    if (_speedLabel == nil) {
-        _speedLabel = [UILabel new];
-        _speedLabel.text = @"SPEED: ---";
-        _speedLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
-        [self.contentView addSubview:_speedLabel];
+- (UILabel *)downloadedProgressLabel {
+    if (_downloadedProgressLabel == nil) {
+        _downloadedProgressLabel = [UILabel new];
+        _downloadedProgressLabel.text = @"DOWNLOADED: 0%";
+        _downloadedProgressLabel.width = 200;
+        _downloadedProgressLabel.height = LABEL_HEIGHT;
+        _downloadedProgressLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
+        [self.contentView addSubview:_downloadedProgressLabel];
     }
     
-    return _speedLabel;
+    return _downloadedProgressLabel;
 }
 
 - (UILabel *)remainingTimeLabel {
     if (_remainingTimeLabel == nil) {
         _remainingTimeLabel = [UILabel new];
         _remainingTimeLabel.width = self.width - 2*STANDARD_PADDING;
-        _remainingTimeLabel.height = 35;
-        _remainingTimeLabel.text = @"Remaining Time: ---";
+        _remainingTimeLabel.height = LABEL_HEIGHT;
+        _remainingTimeLabel.text = @"Remaining Time: 0(s)";
         _remainingTimeLabel.font = [UIFont systemFontOfSize:SMALL_FONT_SIZE];
         [self.contentView addSubview:_remainingTimeLabel];
     }
