@@ -13,12 +13,11 @@
 #import "LDCommonMacros.h"
 #import "NSFileManager+Extension.h"
 
-#define IMAGE_DIRECTORY_NAME @"Downloaded Images"
-#define DEFAUL_DOWNLOADED_DIRECTORY_NAME @"Downloaded Files"
-#define TIMEOUT_INTERVAL_FOR_REQUEST 10
-#define NO_LIMIT_CONCURRENT_DOWNLOADS -1
-#define DEFAULT_RETRY_COUNT 3
-#define DEFAULT_RETRY_INTERVAL 10
+#define IMAGE_DIRECTORY_NAME                @"Downloaded Images"
+#define TIMEOUT_INTERVAL_FOR_REQUEST        10
+#define NO_LIMIT_CONCURRENT_DOWNLOADS       -1
+#define DEFAULT_RETRY_COUNT                 3
+#define DEFAULT_RETRY_INTERVAL              10
 
 @interface ZADownloadManager() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
@@ -115,27 +114,22 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                 
                 case ZADownloadItemStatePaused:
                 {
-                    // if can't start downloading:
-                    if (![self canStartADownloadItem]) {
-                        
-                        // chuyển cả MODEL + subModel -> Pending
+                    /// Nếu không thể resume:
+                    ifnot ([self canStartADownloadItem]) {
+                        /// Chuyển cả MODEL + subModel -> Pending
                         requestItem.state = ZADownloadItemStatePending;
                         existedDownloadItem.commonState = ZADownloadItemStatePending;
                         [existedDownloadItem addRequestItem:requestItem];
                         
-                        // nếu priority của subModel > Model
+                        /// Nếu priority của subModel > Model
                         if (requestItem.priority>existedDownloadItem.commonPriority) {
                             existedDownloadItem.commonPriority = requestItem.priority;
                             [self addToPendingList:existedDownloadItem];
                         }
-                        
                     } else {
-                        
-                        // can start download:
-                        
-                        requestItem.state = ZADownloadItemStatePaused;          // assume that it's paused.
+                        requestItem.state = ZADownloadItemStatePaused;
                         [existedDownloadItem addRequestItem:requestItem];
-                        // resume:
+                        
                         if (requestItem.backgroundMode) {
                             [existedDownloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.backgroundURLSession];
                         } else {
@@ -171,11 +165,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             
         } else {
             /// Trường hợp ITEM mới tinh, chưa download lần nào:
-            
-            // Create new CommonDownloadItem:
+            /// Create new CommonDownloadItem:
             ZACommonDownloadItem *commonDownloadItem = [[ZACommonDownloadItem alloc] initWithRequestItem:requestItem];
             
-            // create DownloadTask for CommonDownloadnItem.
+            /// Create DownloadTask for CommonDownloadnItem.
             NSURL *url = [NSURL URLWithString:requestItem.urlString];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             NSURLSessionDownloadTask *downloadTask;
@@ -188,14 +181,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             commonDownloadItem.retryCount = retryCount;
             commonDownloadItem.retryInterval = retryInterval;
             
-            // add to dictionary:
+            /// Add to dictionary:
             if (requestItem.backgroundMode) {
                 [self.backgroundDownloadItemsDict setObject:commonDownloadItem forKey:requestItem.urlString];
             } else {
                 [self.foregroundDownloadItemsDict setObject:commonDownloadItem forKey:requestItem.urlString];
             }
             
-            // start or pending:
+            /// Start or Pending:
             if ([self canStartADownloadItem]) {
                 self.totalDownloadingUrls++;
                 [commonDownloadItem startDownloadingRequest:requestItem.requestId];
@@ -308,7 +301,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         /// Cache downloadedImage
         if (downloadedImage) {
             [DownloadedImageCache.sharededInstance storeImage:downloadedImage byId:urlString];
-            // call back image.
             if (completionBlock) {
                 completionBlock(downloadedImage,destinationUrl);
             }
@@ -396,42 +388,30 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     }
 }
 
-- (void)retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem
-                               withUrlString:(NSString *)urlString {
-    
+- (void)retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem withUrlString:(NSString *)urlString {
     if (commonDownloadItem.commonResumeData) {
         
     } else {
         
         [commonDownloadItem.commonDownloadTask cancel];
-        
-        // create download task
-        
+
         NSURL *url = [NSURL URLWithString:urlString];
-        
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        
         NSURLSessionDownloadTask *downloadTask;
         
         if (commonDownloadItem.backgroundMode) {
-            
             downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
-            
         } else {
-            
             downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
-            
         }
         
         commonDownloadItem.commonDownloadTask = downloadTask;
-        
         _totalDownloadingUrls++;
         [commonDownloadItem startDownloadingAllRequests];
     }
 }
 
 - (void)cancelDownloadingOfRequest:(ZARequestItem *)requestItem {
-    
     dispatch_async(_serialQueue, ^{
         
         // get MODEL:
@@ -445,7 +425,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         // CANCEL:
         [downloadItem cancelDownloadingWithRequestId:requestItem.requestId];
         
-        //
         if (downloadItem.requestItemsDict.count == 0) {
             
             if (downloadItem.commonState == ZADownloadItemStateDownloading) {
@@ -469,17 +448,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     });
 }
 
-# pragma mark - NSURLSessionDelegate implementation
+# pragma mark - NSURLSessionDelegate
 
-// notify progress when downloading.
 - (void)URLSession:(NSURLSession *)session
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
       didWriteData:(int64_t)bytesWritten
  totalBytesWritten:(int64_t)totalBytesWritten
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    
-    
-    // get urlString, downloadItem from downloadTask.
+    /// notify progress when downloading.
+    /// get urlString, downloadItem from downloadTask.
     NSString *urlString = downloadTask.originalRequest.URL.absoluteString;
     if (!urlString) {
         urlString = downloadTask.currentRequest.URL.absoluteString;
@@ -491,14 +468,12 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
         downloadItem = [self.foregroundDownloadItemsDict objectForKey:urlString];
     }
     
-    
-    // cancel old task.
+    /// cancel old task.
     if (downloadTask.taskIdentifier != downloadItem.commonDownloadTask.taskIdentifier) {
         [downloadTask cancel];
         return;
     }
     
-    //
     for (ZARequestItem *subDownloadItem in downloadItem.requestItemsDict.allValues) {
         if (subDownloadItem.progressBlock && subDownloadItem.state == ZADownloadItemStateDownloading) {
             CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
@@ -512,12 +487,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
     
 }
 
-// finished downlad file, which is stored as a temporary file in NSURL location.
 - (void)URLSession:(NSURLSession *)session
       downloadTask:(NSURLSessionDownloadTask *)downloadTask
 didFinishDownloadingToURL:(NSURL *)location {
-    
-    // Get Completed ZADownloadModel.
+    /// finished downlad file, which is stored as a temporary file in NSURL location.
+    /// Get Completed ZADownloadModel.
     NSString *urlString = downloadTask.currentRequest.URL.absoluteString;
     if (!urlString) {
         urlString = downloadTask.originalRequest.URL.absoluteString;
@@ -530,9 +504,7 @@ didFinishDownloadingToURL:(NSURL *)location {
         commonDownloadItem = [self.foregroundDownloadItemsDict objectForKey:urlString];
     }
     
-    // If existed:
     if (commonDownloadItem) {
-        
         NSError *error;
         NSURL *tempUrl;
         
@@ -583,19 +555,17 @@ didFinishDownloadingToURL:(NSURL *)location {
     }
 }
 
-// called when user pause, cancle, loss connection,.....
 - (void) URLSession:(NSURLSession *)session
                task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error {
-    // download success:
-    if (!error) {
-        return;
-    }
+    /// called when user pause, cancle, loss connection,.....
+    /// download success:
+    ifnot (error) return;
     
-    // error cases:
-    // get model which has error.
+    /// error cases:
+    /// get model which has error.
     NSString *urlString = task.currentRequest.URL.absoluteString;
-    if (!urlString) {
+    ifnot (urlString) {
         urlString = task.originalRequest.URL.absoluteString;
     }
     
@@ -606,15 +576,18 @@ didCompleteWithError:(NSError *)error {
         commonDownloadItem = [self.foregroundDownloadItemsDict objectForKey:urlString];
     }
     
-    // handle erros:
+    /// handle erros:
     switch (error.code) {
-            // canceled/paused a task
+        /// canceled/paused a task
         case -999:
+        {
             return;
             break;
+        }
             
-            // No connection.
+        /// No connection.
         case -1009:
+        {
             _totalDownloadingUrls--;
             [commonDownloadItem pauseAlls];
             
@@ -628,7 +601,7 @@ didCompleteWithError:(NSError *)error {
                 return;
             }
             
-            // retry failed alls, so callback error:
+            /// retry failed alls, so callback error:
             commonDownloadItem.commonState = ZADownloadItemStateInterrupted;
             [commonDownloadItem resetRetryCount];
             
@@ -643,23 +616,11 @@ didCompleteWithError:(NSError *)error {
             }
             return;
             break;
-            
-            // downloading -> timeout request (loss connection).
+        }
+        /// downloading -> timeout request (loss connection).
         case -1001:
-            //            // handle logic:
-            //            downloadItem.commonState = ZADownloadItemStateInterrupted;
-            //            if (error.userInfo[NSURLSessionDownloadTaskResumeData]) {
-            //                // save resume
-            //                downloadItem.resumeData = error.userInfo[NSURLSessionDownloadTaskResumeData];
-            //            } else {
-            //                NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeCannotBeResumed userInfo:nil];
-            //                if (downloadItem.listErrorBlock) {
-            //                    [downloadItem forwardAllErrorBlockWithError:error];
-            //                }
-            //                downloadItem.commonState = ZADownloadItemStateInterrupted;
-            //            }
-            
-            // retry:
+        {
+            /// retry:
             NSLog(@"dld: Before decrese total Active Urls = %lu",_totalDownloadingUrls);
             _totalDownloadingUrls--;
             if (commonDownloadItem.retryCount>0) {
@@ -670,27 +631,17 @@ didCompleteWithError:(NSError *)error {
                 });
                 return;
             }
-            
-            
-            // retry failed alls, so callback error:
-            //            [downloadItem resetRetryCount];
-            //            if (downloadItem.listErrorBlock) {
-            //                NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeTimeoutRequest userInfo:nil];
-            //                [downloadItem forwardAllErrorBlockWithError:error];
-            //            }
+
             return;
             break;
+        }
         default:
             break;
     }
-    
-    // other errors:
-    // [downloadItem forwardAllErrorBlockWithError:error];
-    // downloadItem.state = ZADownloadModelStateCancelled;
 }
 
-// notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
 - (void) URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
+    // notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
     dispatch_async(dispatch_get_main_queue(), ^{
         AppDelegate *appDelegate = (AppDelegate*) UIApplication.sharedApplication.delegate;
         appDelegate.backgroundSessionCompleteHandler();
@@ -698,10 +649,11 @@ didCompleteWithError:(NSError *)error {
     });
 }
 
-# pragma mark - Private methods: handle logics.
-- (NSUInteger) remainingTimeForDownload: (ZACommonDownloadItem*)downloadItem
-                       bytesTransferred: (int64_t)bytesTransferred
-              totalBytesExpectedToWrite: (int64_t)totalBytesExpectedToWrite {
+#pragma mark - Private methods
+
+- (NSUInteger)remainingTimeForDownload:(ZACommonDownloadItem*)downloadItem
+                       bytesTransferred:(int64_t)bytesTransferred
+              totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
     NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:downloadItem.startDate];
     CGFloat speed = (CGFloat)bytesTransferred / (CGFloat)timeInterval;
     CGFloat remainingBytes = totalBytesExpectedToWrite - bytesTransferred;
@@ -761,7 +713,7 @@ didCompleteWithError:(NSError *)error {
     return isValid;
 }
 
-- (void)reachabilityChanged: (NSNotification *)note {
+- (void)reachabilityChanged:(NSNotification *)note {
     Reachability* reachability = [note object];
     NetworkStatus netStatus = [reachability currentReachabilityStatus];     // status of network.
     if (netStatus == ReachableViaWiFi) {
