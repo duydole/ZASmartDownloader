@@ -11,27 +11,25 @@
 #import "ZAImageCache.h"
 #import "Reachability.h"
 #import "LDCommonMacros.h"
+#import "NSFileManager+Extension.h"
 
 #define IMAGE_DIRECTORY_NAME @"Downloaded Images"
 #define DEFAUL_DOWNLOADED_DIRECTORY_NAME @"Downloaded Files"
 #define TIMEOUT_INTERVAL_FOR_REQUEST 10
+#define NO_LIMIT_CONCURRENT_DOWNLOADS -1
 
 @interface ZADownloadManager() <NSURLSessionDelegate, NSURLSessionDownloadDelegate>
 
 @property (nonatomic, strong) Reachability *internetReachability;                       // internet Reachability.
 @property (nonatomic, assign) NSUInteger totalDownloadingUrls;                          // total downlading urls
 
-// directory:
-@property (nonatomic, strong) NSURL *temporatyDirectoryUrl;                             // default directory for storing TEMP FILES.
-@property (nonatomic, strong) NSURL *defaultDownloadedFilesDirectoryUrl;                // default directory for storing downloaded files.
-
 // 2 URL Sessions.
 @property (nonatomic, strong) NSURLSession *forcegroundURLSession;                      // manage downloadtasks on forceground.
 @property (nonatomic, strong) NSURLSession *backgroundURLSession;                       // manage downloadtasks in background.
 
 // 2 queue
-@property (nonatomic, strong) dispatch_queue_t fileDownloaderSerialQueue;               // serial queue.
-@property (nonatomic, strong) dispatch_queue_t fileDownloaderConcurrentQueue;           // concurrent queue.
+@property (nonatomic, strong) dispatch_queue_t serialQueue;               // serial queue.
+@property (nonatomic, strong) dispatch_queue_t concurrentQueue;           // concurrent queue.
 
 // store Dictionary of <UrlString, CommonDownloadItem>
 @property (nonatomic, strong) NSMutableDictionary *backgroundDownloadItemsDict;         // background DownloadItems.
@@ -57,52 +55,26 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (void)setup {
-    _maxConcurrentDownloads = -1;                       // no limit.
-    _totalDownloadingUrls = 0;                          // 0 total Downloading Urls.
+    _maxConcurrentDownloads = NO_LIMIT_CONCURRENT_DOWNLOADS;
+    _totalDownloadingUrls = 0;
     
-    // Default dir:
-    NSError *error = nil;
-    _defaultDownloadedFilesDirectoryUrl = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:false error:&error];
-    _temporatyDirectoryUrl = [[NSFileManager defaultManager] temporaryDirectory];
-    
-    // setup reachability:
+    /// Reachability:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     self.internetReachability = [Reachability reachabilityForLocalWiFi];
     [self.internetReachability startNotifier];
     
-    // 2 queues:
-    _fileDownloaderSerialQueue = dispatch_queue_create("duydl.DownloadManager.SerialQueue", DISPATCH_QUEUE_SERIAL);
-    _fileDownloaderConcurrentQueue = dispatch_queue_create("duydl.DownloadManager.ConcurrentQueue", DISPATCH_QUEUE_CONCURRENT);
+    /// Queues:
+    _serialQueue = dispatch_queue_create("duydl.DownloadManager.SerialQueue", DISPATCH_QUEUE_SERIAL);
+    _concurrentQueue = dispatch_queue_create("duydl.DownloadManager.ConcurrentQueue", DISPATCH_QUEUE_CONCURRENT);
     
-    // priority lists:
+    /// Priority lists:
     _highPriorityDownloadItems = [NSMutableArray new];
     _mediumPriorityDownloadItems = [NSMutableArray new];
-    _lowPriorityDownloadItems = [[NSMutableArray alloc] init];
+    _lowPriorityDownloadItems = [NSMutableArray new];
     
-    // downloadItems dict:
+    /// downloadItems dictionary:
     _backgroundDownloadItemsDict = [NSMutableDictionary new];
     _foregroundDownloadItemsDict = [NSMutableDictionary new];
-}
-
-- (NSURLSession*)backgroundURLSession {
-    if (!_backgroundURLSession) {
-        // backgroundSession alway waits for connectivity.
-        NSURLSessionConfiguration *backgroundConfig = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"duydl.DownloadManager.backgroundsession"];
-        backgroundConfig.discretionary = true;
-        backgroundConfig.sessionSendsLaunchEvents = true;
-        _backgroundURLSession = [NSURLSession sessionWithConfiguration:backgroundConfig delegate:self delegateQueue:nil];
-    }
-    return _backgroundURLSession;
-}
-
-- (NSURLSession*)forcegroundURLSession {
-    if(!_forcegroundURLSession) {
-        NSURLSessionConfiguration *defaultConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-        //defaultConfig.waitsForConnectivity = true;  // waits for connectitity, don't notify error immediately.
-        defaultConfig.timeoutIntervalForRequest = TIMEOUT_INTERVAL_FOR_REQUEST;
-        _forcegroundURLSession = [NSURLSession sessionWithConfiguration:defaultConfig delegate:self delegateQueue:nil];
-    }
-    return _forcegroundURLSession;
 }
 
 #pragma mark - Public methods
@@ -110,48 +82,41 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem
                          retryCount:(NSUInteger)retryCount
                       retryInterval:(NSUInteger)retryInterval {
-    dispatch_async(_fileDownloaderSerialQueue, ^{
+    dispatch_async(_serialQueue, ^{
         
-        // 0. Check is existed on TEMP Directory:
-        NSString *fileName = [requestItem.urlString lastPathComponent];
-        if ([self isExistedFileName:fileName inDirectory:self.temporatyDirectoryUrl]) {
-            NSURL *tempFileUrl = [self.temporatyDirectoryUrl URLByAppendingPathComponent:fileName];
-            
-            // copy to destination -> return.
-            NSError *error;
-            [[NSFileManager defaultManager] copyItemAtURL:tempFileUrl toURL:requestItem.destinationUrl error:&error];
+        /// Nếu item này đã tải xong và nằm trong thư mục TEMP thì copy đến DestinationDirectory
+        /// Sau đó bắn completion và return
+        if (requestItem.isExistedOnTempDirectory) {
+            NSURL *tempFileUrl = [TEMP_URL URLByAppendingPathComponent:requestItem.fileName];
+            [[NSFileManager defaultManager] copyItemAtURL:tempFileUrl toURL:requestItem.destinationUrl error:nil];
             if (requestItem.completionBlock) {
                 ZADownloadCompletionBlock completion = requestItem.completionBlock;
-                dispatch_async(self.fileDownloaderConcurrentQueue, ^{
+                dispatch_async(self.concurrentQueue, ^{
                     completion(requestItem.destinationUrl);
                 });
             }
             return;
         }
         
-        // 1. Get downloadItem in Dictionary:
-        ZACommonDownloadItem *existedDownloadItem = nil;
-        if (requestItem.backgroundMode) {
-            existedDownloadItem = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-        } else {
-            existedDownloadItem = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-        }
-        
-        // 2. If DownloadItem is existed in Dictionary.
+        /// Nếu item chưa nằm trong TEMP
+        /// Check thử item này đã được download rồi và nằm chỗ nào đó hay chưa.
+        ZACommonDownloadItem *existedDownloadItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
+            
+        /// Nếu item mày muốn download đã tồn tại rồi (đang download or somethingelse)
         if (existedDownloadItem) {
             
-            // check state of Existed CommonDownloadItem.
+            ///State hiện tại của item này là:
             switch (existedDownloadItem.commonState) {
-                    
-                    // DOWNLOADING
                 case ZADownloadItemStateDownloading:
+                {
                     requestItem.state = ZADownloadItemStateDownloading;
                     [existedDownloadItem addRequestItem:requestItem];
                     return;
                     break;
-                    
-                    // PAUSED
+                }
+                
                 case ZADownloadItemStatePaused:
+                {
                     // if can't start downloading:
                     if (![self canStartADownloadItem]) {
                         
@@ -181,21 +146,24 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                     }
                     
                     break;
+                }
                     
-                    // PENDING.
                 case ZADownloadItemStatePending:
+                {
                     if (requestItem.priority > existedDownloadItem.commonPriority) {
                         existedDownloadItem.commonPriority = requestItem.priority;
                     }
                     requestItem.state = ZADownloadItemStatePending;
                     [existedDownloadItem addRequestItem:requestItem];
                     break;
+                }
                     
                 default:
+                    NSAssert(NO, @"Chưa handle state này");
                     break;
             }
             
-            // start downloading or pending.
+            /// StartDownload hoặc add vào list pending tương ứng
             if ([self canStartADownloadItem]) {
                 self.totalDownloadingUrls++;
                 [existedDownloadItem startDownloadingRequest:requestItem.requestId];
@@ -204,6 +172,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             }
             
         } else {
+            /// Trường hợp ITEM mới tinh, chưa download lần nào:
             
             // Create new CommonDownloadItem:
             ZACommonDownloadItem *commonDownloadItem = [[ZACommonDownloadItem alloc] initWithRequestItem:requestItem];
@@ -365,7 +334,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (void)pauseDownloadingOfRequest:(ZARequestItem *)requestItem {
-    dispatch_async(_fileDownloaderSerialQueue, ^{
+    dispatch_async(_serialQueue, ^{
         // 1. Get CommonDownloadItem will be paused.
         ZACommonDownloadItem *downloadItem = nil;
         if (requestItem.backgroundMode) {
@@ -388,7 +357,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (void)resumeDownloadingOfRequest:(ZARequestItem *)requestItem {
-    dispatch_async(_fileDownloaderSerialQueue, ^{
+    dispatch_async(_serialQueue, ^{
         // if can resume
         if ([self canStartADownloadItem]) {
             // 1. Get MODEL you want to RESUME.
@@ -409,7 +378,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             // if over max concurrent.
             ZADownloadErrorBlock errorBlock = requestItem.errorBlock;
             NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeOverMaxConcurrentDownloads userInfo:nil];
-            dispatch_async(self.fileDownloaderConcurrentQueue, ^{
+            dispatch_async(self.concurrentQueue, ^{
                 errorBlock(error);
             });
         }
@@ -476,7 +445,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 - (void)cancelDownloadingOfRequest:(ZARequestItem *)requestItem {
     
-    dispatch_async(_fileDownloaderSerialQueue, ^{
+    dispatch_async(_serialQueue, ^{
         
         // get MODEL:
         ZACommonDownloadItem *downloadItem = nil;
@@ -514,11 +483,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (NSURL *)getDefaultDownloadedFileDirectoryUrl {
-    return _defaultDownloadedFilesDirectoryUrl;
+    return DOCUMENT_URL;
 }
 
 - (NSURL *)getDefaultDownloadedImageDirectoryUrl {
-    return [self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:IMAGE_DIRECTORY_NAME];
+    return [DOCUMENT_URL URLByAppendingPathComponent:IMAGE_DIRECTORY_NAME];
 }
 
 # pragma mark - NSURLSessionDelegate implementation
@@ -595,8 +564,8 @@ didFinishDownloadingToURL:(NSURL *)location {
             if (requestItem.state == ZADownloadItemStateDownloading) {
                 
                 // copy to TEMP Dir
-                tempUrl = [_temporatyDirectoryUrl URLByAppendingPathComponent:[urlString lastPathComponent]];
-                if (![self isExistedFileName:[urlString lastPathComponent] inDirectory:_temporatyDirectoryUrl]) {
+                tempUrl = [TEMP_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
+                if (![self isExistedFileName:[urlString lastPathComponent] inDirectory:TEMP_URL]) {
                     [[NSFileManager defaultManager] copyItemAtURL:location toURL:tempUrl error:&error];                             // copy to TEMP
                 }
                 
@@ -606,7 +575,7 @@ didFinishDownloadingToURL:(NSURL *)location {
                 // callback
                 ZADownloadCompletionBlock completion = requestItem.completionBlock;
                 if (completion) {
-                    dispatch_async(_fileDownloaderConcurrentQueue, ^{
+                    dispatch_async(_concurrentQueue, ^{
                         completion(requestItem.destinationUrl);
                     });
                 }
@@ -674,7 +643,7 @@ didCompleteWithError:(NSError *)error {
             if (commonDownloadItem.retryCount>0) {
                 NSLog(@"dld: No connection,retryInterval: %lu, remaining retries: %lu",commonDownloadItem.retryInterval,commonDownloadItem.retryCount);
                 commonDownloadItem.retryCount--;
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(commonDownloadItem.retryInterval * NSEC_PER_SEC)), _fileDownloaderSerialQueue, ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(commonDownloadItem.retryInterval * NSEC_PER_SEC)), _serialQueue, ^{
                     [self retryDownloadingOfCommonDownloadItem:commonDownloadItem withUrlString:urlString];
                 });
                 return;
@@ -688,7 +657,7 @@ didCompleteWithError:(NSError *)error {
                 if (requestItem.errorBlock) {
                     NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeNoConnection userInfo:nil];
                     ZADownloadErrorBlock errorBlock = requestItem.errorBlock;
-                    dispatch_async(self.fileDownloaderConcurrentQueue, ^{
+                    dispatch_async(self.concurrentQueue, ^{
                         errorBlock(error);
                     });
                 }
@@ -717,7 +686,7 @@ didCompleteWithError:(NSError *)error {
             if (commonDownloadItem.retryCount>0) {
                 NSLog(@"dld: Loss connection,retryInterval: %lu, remaining retries: %lu",commonDownloadItem.retryInterval,commonDownloadItem.retryCount);
                 commonDownloadItem.retryCount--;
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(commonDownloadItem.retryInterval * NSEC_PER_SEC)), _fileDownloaderSerialQueue, ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(commonDownloadItem.retryInterval * NSEC_PER_SEC)), _serialQueue, ^{
                     //[self retryDowloadingOfUrl:urlString];
                 });
                 return;
@@ -831,7 +800,7 @@ didCompleteWithError:(NSError *)error {
 
 - (NSUInteger)numberOfDownloadingUrls {
     __block NSUInteger total;
-    dispatch_sync(_fileDownloaderSerialQueue, ^{
+    dispatch_sync(_serialQueue, ^{
         total = self.totalDownloadingUrls;
     });
     return total;
@@ -868,12 +837,36 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
+#pragma mark - Getter/Setter
+
+- (NSURLSession *)backgroundURLSession {
+    ifnot (_backgroundURLSession) {
+        // backgroundSession alway waits for connectivity.
+        NSURLSessionConfiguration *backgroundConfig = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"duydl.DownloadManager.backgroundsession"];
+        backgroundConfig.discretionary = true;
+        backgroundConfig.sessionSendsLaunchEvents = true;
+        _backgroundURLSession = [NSURLSession sessionWithConfiguration:backgroundConfig delegate:self delegateQueue:nil];
+    }
+    
+    return _backgroundURLSession;
+}
+
+- (NSURLSession *)forcegroundURLSession {
+    ifnot (_forcegroundURLSession) {
+        NSURLSessionConfiguration *defaultConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+        //defaultConfig.waitsForConnectivity = true;  // waits for connectitity, don't notify error immediately.
+        defaultConfig.timeoutIntervalForRequest = TIMEOUT_INTERVAL_FOR_REQUEST;
+        _forcegroundURLSession = [NSURLSession sessionWithConfiguration:defaultConfig delegate:self delegateQueue:nil];
+    }
+    return _forcegroundURLSession;
+}
+
 #pragma mark - Private methods: system file logics.
 
 - (void)createDirectoryWithName:(NSString *)directoryName {
     NSFileManager *fileManager= [NSFileManager defaultManager];
     NSError *error = nil;
-    [fileManager createDirectoryAtURL:[self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
+    [fileManager createDirectoryAtURL:[DOCUMENT_URL URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
 }
 
 - (BOOL)isExistedFileName:(NSString *)fileName
@@ -894,11 +887,22 @@ didCompleteWithError:(NSError *)error {
     NSURL *fileUrl;
     if (directoryName) {
         [self createDirectoryWithName:directoryName];
-        fileUrl = [[self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:directoryName] URLByAppendingPathComponent:fileName];
+        fileUrl = [[DOCUMENT_URL URLByAppendingPathComponent:directoryName] URLByAppendingPathComponent:fileName];
     } else {
-        fileUrl = [self.defaultDownloadedFilesDirectoryUrl URLByAppendingPathComponent:fileName];
+        fileUrl = [DOCUMENT_URL URLByAppendingPathComponent:fileName];
     }
     return fileUrl;
 }
+
+- (ZACommonDownloadItem *)_getZACommonDownloadItemWithRequestItem:(ZARequestItem *)requestItem {
+    ZACommonDownloadItem *item = nil;
+    if (requestItem.backgroundMode) {
+        item = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
+    } else {
+        item = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
+    }
+    return  item;
+}
+
 
 @end

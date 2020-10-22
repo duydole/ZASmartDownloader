@@ -2,7 +2,7 @@
 
 @interface ZACommonDownloadItem()
 
-@property NSUInteger maxRetryCount;
+@property (nonatomic, assign) NSUInteger maxRetryCount;
 
 @end
 

@@ -23,6 +23,8 @@
 		F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25F2540048D00D83ED4 /* ZADownloadManager.m */; };
 		F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F248309F25407F2100539EAF /* DownloadItemTableViewCell.m */; };
 		F24830A42540880400539EAF /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24830A32540880400539EAF /* UIView+Extension.m */; };
+		F24F4F94254155E700DFC2CF /* NSFileManager+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */; };
+		F24F4F9A2541597100DFC2CF /* NSURL+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24F4F992541597000DFC2CF /* NSURL+Extension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,10 @@
 		F24830A22540880400539EAF /* UIView+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Extension.h"; sourceTree = "<group>"; };
 		F24830A32540880400539EAF /* UIView+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
 		F24F4F8D2541535E00DFC2CF /* LDCommonMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDCommonMacros.h; sourceTree = "<group>"; };
+		F24F4F92254155E700DFC2CF /* NSFileManager+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Extension.h"; sourceTree = "<group>"; };
+		F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Extension.m"; sourceTree = "<group>"; };
+		F24F4F982541597000DFC2CF /* NSURL+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURL+Extension.h"; sourceTree = "<group>"; };
+		F24F4F992541597000DFC2CF /* NSURL+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Extension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +217,7 @@
 		F24F4F872541517300DFC2CF /* Business */ = {
 			isa = PBXGroup;
 			children = (
+				F24F4F91254155CF00DFC2CF /* Extensions */,
 				F24F4F8C2541532E00DFC2CF /* Common */,
 				ECB2EE3C22CCAB5800BCB30E /* ZADownloadManager */,
 			);
@@ -236,6 +243,17 @@
 				F24F4F8D2541535E00DFC2CF /* LDCommonMacros.h */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		F24F4F91254155CF00DFC2CF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F24F4F92254155E700DFC2CF /* NSFileManager+Extension.h */,
+				F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */,
+				F24F4F982541597000DFC2CF /* NSURL+Extension.h */,
+				F24F4F992541597000DFC2CF /* NSURL+Extension.m */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -377,7 +395,9 @@
 				F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */,
 				F24830A42540880400539EAF /* UIView+Extension.m in Sources */,
 				F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */,
+				F24F4F94254155E700DFC2CF /* NSFileManager+Extension.m in Sources */,
 				EC4DF10622CC9E8A0049DBFF /* ViewController.m in Sources */,
+				F24F4F9A2541597100DFC2CF /* NSURL+Extension.m in Sources */,
 				E134592822DE1A58001143AC /* ZAImageCache.m in Sources */,
 				E1156F1022E052980056D8FB /* Reachability.m in Sources */,
 				F227D25D253FFD2400D83ED4 /* DownloadItem.m in Sources */,

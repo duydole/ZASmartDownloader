@@ -46,6 +46,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
 @property (nonatomic, strong) ZADownloadProgressBlock progressBlock;
 @property (nonatomic, strong) ZADownloadCompletionBlock completionBlock;
 @property (nonatomic, strong) ZADownloadErrorBlock errorBlock;
+@property (nonatomic, readonly) NSString *fileName;
 
 - (instancetype)initWithUrlString:(NSString*)urlString
                   isBackgroundMode:(BOOL)isBackgroundMode
@@ -54,4 +55,7 @@ typedef NS_ENUM(NSInteger, ZADownloadModelPriroity) {
                           progress:(ZADownloadProgressBlock)progressBlock
                         completion:(ZADownloadCompletionBlock)completionBlock
                            failure:(ZADownloadErrorBlock)errorBlock;
+
+- (BOOL)isExistedOnTempDirectory;
+
 @end

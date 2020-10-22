@@ -7,6 +7,9 @@
 //
 
 #import "ZARequestItem.h"
+#import "LDCommonMacros.h"
+#import "NSFileManager+Extension.h"
+#import "NSURL+Extension.h"
 
 @implementation ZARequestItem
 
@@ -32,6 +35,15 @@
     }
     
     return self;
+}
+
+- (NSString *)fileName {
+    ifnot (self.urlString) return nil;
+    return [self.urlString lastPathComponent];
+}
+
+- (BOOL)isExistedOnTempDirectory {
+    return [TEMP_URL containFileName:self.fileName];
 }
 
 @end

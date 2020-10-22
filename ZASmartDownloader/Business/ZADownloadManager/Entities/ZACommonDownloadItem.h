@@ -18,24 +18,16 @@
 @property (nonatomic) NSUInteger retryCount;
 @property (nonatomic) NSUInteger retryInterval;
 
-- (instancetype) initWithRequestItem:(ZARequestItem*)requestItem;
-
-- (void) addRequestItem:(ZARequestItem*)requestItem;
-
-- (void) removeARequestItem:(ZARequestItem*)requestItem;
-
-- (void) startDownloadingRequest:(NSString*)requestId;
-- (void) startDownloadingAllRequests;
-
-- (void) startAllPendingRequestItems;
-
-- (void) pauseAlls;
-- (void) pauseDownloadingWithRequestId:(NSString*)requestId;
-
-- (void) resumeDownloadingWithRequestId:(NSString*)requestId urlSession:(NSURLSession*)session;
-
-- (void) cancelDownloadingWithRequestId:(NSString*)requestId;
-
-- (void) resetRetryCount;
+- (instancetype)initWithRequestItem:(ZARequestItem*)requestItem;
+- (void)addRequestItem:(ZARequestItem*)requestItem;
+- (void)removeARequestItem:(ZARequestItem*)requestItem;
+- (void)startDownloadingRequest:(NSString*)requestId;
+- (void)startDownloadingAllRequests;
+- (void)startAllPendingRequestItems;
+- (void)pauseAlls;
+- (void)pauseDownloadingWithRequestId:(NSString*)requestId;
+- (void)resumeDownloadingWithRequestId:(NSString*)requestId urlSession:(NSURLSession*)session;
+- (void)cancelDownloadingWithRequestId:(NSString*)requestId;
+- (void)resetRetryCount;
 
 @end
