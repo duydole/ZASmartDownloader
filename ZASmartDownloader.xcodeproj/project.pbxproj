@@ -16,7 +16,6 @@
 		EC4DF10B22CC9E8A0049DBFF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EC4DF10A22CC9E8A0049DBFF /* Assets.xcassets */; };
 		EC4DF10E22CC9E8A0049DBFF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EC4DF10C22CC9E8A0049DBFF /* LaunchScreen.storyboard */; };
 		EC4DF11122CC9E8A0049DBFF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11022CC9E8A0049DBFF /* main.m */; };
-		EC4DF11B22CC9E8B0049DBFF /* ZASmartDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11A22CC9E8B0049DBFF /* ZASmartDownloaderTests.m */; };
 		EC4DF12622CC9E8B0049DBFF /* ZASmartDownloaderUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF12522CC9E8B0049DBFF /* ZASmartDownloaderUITests.m */; };
 		ECB2EE4222CCAB6900BCB30E /* ZACommonDownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = ECB2EE4122CCAB6900BCB30E /* ZACommonDownloadItem.m */; };
 		F227D25D253FFD2400D83ED4 /* DownloadItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25C253FFD2400D83ED4 /* DownloadItem.m */; };
@@ -25,6 +24,9 @@
 		F24830A42540880400539EAF /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24830A32540880400539EAF /* UIView+Extension.m */; };
 		F24F4F94254155E700DFC2CF /* NSFileManager+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */; };
 		F24F4F9A2541597100DFC2CF /* NSURL+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F24F4F992541597000DFC2CF /* NSURL+Extension.m */; };
+		F2AB164D25426F000040B916 /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25F2540048D00D83ED4 /* ZADownloadManager.m */; };
+		F2AB165025426F310040B916 /* ZASmartDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11A22CC9E8B0049DBFF /* ZASmartDownloaderTests.m */; };
+		F2AB16532542704A0040B916 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F2AB16522542704A0040B916 /* UIImage+Extension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +84,8 @@
 		F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Extension.m"; sourceTree = "<group>"; };
 		F24F4F982541597000DFC2CF /* NSURL+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURL+Extension.h"; sourceTree = "<group>"; };
 		F24F4F992541597000DFC2CF /* NSURL+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Extension.m"; sourceTree = "<group>"; };
+		F2AB16512542704A0040B916 /* UIImage+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Extension.h"; sourceTree = "<group>"; };
+		F2AB16522542704A0040B916 /* UIImage+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Extension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -252,6 +256,8 @@
 				F24F4F93254155E700DFC2CF /* NSFileManager+Extension.m */,
 				F24F4F982541597000DFC2CF /* NSURL+Extension.h */,
 				F24F4F992541597000DFC2CF /* NSURL+Extension.m */,
+				F2AB16512542704A0040B916 /* UIImage+Extension.h */,
+				F2AB16522542704A0040B916 /* UIImage+Extension.m */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -392,6 +398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E107F1E822E89715003194B9 /* ZARequestItem.m in Sources */,
+				F2AB16532542704A0040B916 /* UIImage+Extension.m in Sources */,
 				F227D2602540048D00D83ED4 /* ZADownloadManager.m in Sources */,
 				F24830A42540880400539EAF /* UIView+Extension.m in Sources */,
 				F24830A025407F2100539EAF /* DownloadItemTableViewCell.m in Sources */,
@@ -411,7 +418,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC4DF11B22CC9E8B0049DBFF /* ZASmartDownloaderTests.m in Sources */,
+				F2AB164D25426F000040B916 /* ZADownloadManager.m in Sources */,
+				F2AB165025426F310040B916 /* ZASmartDownloaderTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

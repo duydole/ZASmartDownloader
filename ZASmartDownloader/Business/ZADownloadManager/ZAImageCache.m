@@ -7,23 +7,27 @@
 //
 
 #import "ZAImageCache.h"
+#import "UIImage+Extension.h"
 
-@interface DownloadedImageCache()
+#define MAX_CACHE_SIZE 10*1024*1024 // 10Mb
+
+@interface LDImageCache()
 
 @property (nonatomic, strong) NSCache *imageCache;
 @property (nonatomic, assign) NSInteger maxMemory;
 
 @end
 
-@implementation DownloadedImageCache
+@implementation LDImageCache
 
-+ (instancetype)sharededInstance {
-    static DownloadedImageCache *sharedInstance = nil;
++ (instancetype)shared {
+    static LDImageCache *shared = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
+        shared = [self new];
     });
-    return sharedInstance;
+    
+    return shared;
 }
 
 - (instancetype)init {
@@ -35,16 +39,16 @@
 }
 
 - (void)setup {
-    _imageCache = [[NSCache alloc] init];
-    _maxMemory = 10*1024*1024;                  // 10Mb
+    _imageCache = [NSCache new];
+    _maxMemory = MAX_CACHE_SIZE;
     _imageCache.totalCostLimit = _maxMemory;
 }
 
-- (void)storeImage:(UIImage *)image
-              byId:(NSString *)imageId {
+#pragma mark - Public
+
+- (void)cacheImage:(UIImage *)image byId:(NSString *)imageId {
     if (image && imageId) {
-        NSUInteger imageSize = CGImageGetHeight(image.CGImage)*CGImageGetWidth(image.CGImage);
-        [_imageCache setObject:image forKey:imageId cost:imageSize];
+        [_imageCache setObject:image forKey:imageId cost:image.sizeOnMemory];
     }
 }
 

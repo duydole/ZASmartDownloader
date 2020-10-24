@@ -11,12 +11,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DownloadedImageCache : NSCache
+@interface LDImageCache : NSObject
 
-+ (instancetype) sharededInstance;
++ (instancetype)shared;
 
-- (void)storeImage:(UIImage *)image byId: (NSString *)imageId;
-
+- (void)cacheImage:(UIImage *)image byId:(NSString *)imageId;
 - (UIImage *)getImageById:(NSString *)imageId;
 
 @end

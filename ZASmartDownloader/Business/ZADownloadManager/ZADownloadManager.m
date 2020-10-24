@@ -12,6 +12,7 @@
 #import "Reachability.h"
 #import "LDCommonMacros.h"
 #import "NSFileManager+Extension.h"
+#import "NSURL+Extension.h"
 
 #define IMAGE_DIRECTORY_NAME                @"Downloaded Images"
 #define TIMEOUT_INTERVAL_FOR_REQUEST        10
@@ -98,7 +99,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         /// Nếu item chưa nằm trong TEMP
         /// Check thử item này đã được download rồi và nằm chỗ nào đó hay chưa.
         ZACommonDownloadItem *existedDownloadItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
-            
+        
         /// Nếu item mày muốn download đã tồn tại rồi (đang download or somethingelse)
         if (existedDownloadItem) {
             
@@ -111,11 +112,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                     return;
                     break;
                 }
-                
+                    
                 case ZADownloadItemStatePaused:
                 {
                     /// Nếu không thể resume:
-                    ifnot ([self canStartADownloadItem]) {
+                    ifnot ([self _canStartADownloadItem]) {
                         /// Chuyển cả MODEL + subModel -> Pending
                         requestItem.state = ZADownloadItemStatePending;
                         existedDownloadItem.commonState = ZADownloadItemStatePending;
@@ -124,7 +125,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                         /// Nếu priority của subModel > Model
                         if (requestItem.priority>existedDownloadItem.commonPriority) {
                             existedDownloadItem.commonPriority = requestItem.priority;
-                            [self addToPendingList:existedDownloadItem];
+                            [self _addToPendingList:existedDownloadItem];
                         }
                     } else {
                         requestItem.state = ZADownloadItemStatePaused;
@@ -156,11 +157,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             }
             
             /// StartDownload hoặc add vào list pending tương ứng
-            if ([self canStartADownloadItem]) {
+            if ([self _canStartADownloadItem]) {
                 self.totalDownloadingUrls++;
                 [existedDownloadItem startDownloadingRequest:requestItem.requestId];
             } else {
-                [self addToPendingList:existedDownloadItem];
+                [self _addToPendingList:existedDownloadItem];
             }
             
         } else {
@@ -189,11 +190,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             }
             
             /// Start or Pending:
-            if ([self canStartADownloadItem]) {
+            if ([self _canStartADownloadItem]) {
                 self.totalDownloadingUrls++;
                 [commonDownloadItem startDownloadingRequest:requestItem.requestId];
             } else {
-                [self addToPendingList:commonDownloadItem];
+                [self _addToPendingList:commonDownloadItem];
             }
         }
     });
@@ -206,18 +207,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (ZARequestItem *)downloadFileWithURL:(NSString *)urlString
-                       destinationUrl:(NSURL *)destinationUrl
-                 enableBackgroundMode:(BOOL)backgroundMode
-                           retryCount:(NSUInteger)retryCount
-                        retryInterval:(NSUInteger)retryInterval
-                             priority:(ZADownloadModelPriroity)priority
-                             progress:(ZADownloadProgressBlock)progressBlock
-                           completion:(ZADownloadCompletionBlock)completionBlock
-                              failure:(ZADownloadErrorBlock)errorBlock {
+                        destinationUrl:(NSURL *)destinationUrl
+                  enableBackgroundMode:(BOOL)backgroundMode
+                            retryCount:(NSUInteger)retryCount
+                         retryInterval:(NSUInteger)retryInterval
+                              priority:(ZADownloadModelPriroity)priority
+                              progress:(ZADownloadProgressBlock)progressBlock
+                            completion:(ZADownloadCompletionBlock)completionBlock
+                               failure:(ZADownloadErrorBlock)errorBlock {
     NSAssert(retryCount >= 0 && retryInterval >= 0, @"");
     
     /// Check URLString
-    ifnot ([self isValidUrl:urlString]) {
+    ifnot ([self _isValidUrl:urlString]) {
         if (errorBlock) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeInvalidUrl userInfo:nil];
@@ -283,7 +284,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                      failure:(void (^)(NSError *))errorBlock {
     
     /// Check Image-Cache và return nếu có
-    UIImage *cachedImage = [DownloadedImageCache.sharededInstance getImageById:urlString];
+    UIImage *cachedImage = [LDImageCache.shared getImageById:urlString];
     if (cachedImage) {
         NSLog(@"dld: existed in Image cache. I'll forward for you.");
         if (completionBlock) {
@@ -300,7 +301,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         
         /// Cache downloadedImage
         if (downloadedImage) {
-            [DownloadedImageCache.sharededInstance storeImage:downloadedImage byId:urlString];
+            [LDImageCache.shared cacheImage:downloadedImage byId:urlString];
             if (completionBlock) {
                 completionBlock(downloadedImage,destinationUrl);
             }
@@ -331,14 +332,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             NSLog(@"dld: paused all subModels, total downloading urls: %lu",self.totalDownloadingUrls);
         }
         
-        [self startHighestPriorityZADownloadItem];
+        [self _startHighestPriorityZADownloadItem];
     });
 }
 
 - (void)resumeDownloadingOfRequest:(ZARequestItem *)requestItem {
     dispatch_async(_serialQueue, ^{
         // if can resume
-        if ([self canStartADownloadItem]) {
+        if ([self _canStartADownloadItem]) {
             // 1. Get MODEL you want to RESUME.
             ZACommonDownloadItem *commonDownloadItem = nil;
             if (requestItem.backgroundMode) {
@@ -366,7 +367,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 - (void)retryDownloadingOfRequestItem:(ZARequestItem *)requestItem {
     /// retry download of 1 REQUEST ITEM:
-
+    
     // 1. Get CommonDownloadItem will be Retry.
     ZACommonDownloadItem *downloadItem = nil;
     if (requestItem.backgroundMode) {
@@ -394,7 +395,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     } else {
         
         [commonDownloadItem.commonDownloadTask cancel];
-
+        
         NSURL *url = [NSURL URLWithString:urlString];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         NSURLSessionDownloadTask *downloadTask;
@@ -440,11 +441,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         
         // remove Item out of WaitingLists.
         if (downloadItem.commonState == ZADownloadItemStatePending) {
-            [self removeAWaitingDownloadItem:downloadItem];
+            [self _removeAWaitingDownloadItem:downloadItem];
         }
         
         // resume a waiting downloadmodel.
-        [self startHighestPriorityZADownloadItem];
+        [self _startHighestPriorityZADownloadItem];
     });
 }
 
@@ -477,7 +478,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
     for (ZARequestItem *subDownloadItem in downloadItem.requestItemsDict.allValues) {
         if (subDownloadItem.progressBlock && subDownloadItem.state == ZADownloadItemStateDownloading) {
             CGFloat progress = (CGFloat)totalBytesWritten/ (CGFloat)totalBytesExpectedToWrite;
-            NSUInteger remainingTime = [self remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+            NSUInteger remainingTime = [self _remainingTimeForDownload:downloadItem bytesTransferred:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
             NSUInteger speed = bytesWritten/1024;
             dispatch_async(dispatch_get_main_queue(), ^{
                 subDownloadItem.progressBlock(progress, speed, remainingTime);
@@ -516,7 +517,7 @@ didFinishDownloadingToURL:(NSURL *)location {
                 
                 // copy to TEMP Dir
                 tempUrl = [TEMP_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
-                if (![self isExistedFileName:[urlString lastPathComponent] inDirectory:TEMP_URL]) {
+                ifnot ([TEMP_URL containFileName:[urlString lastPathComponent]]) {
                     [[NSFileManager defaultManager] copyItemAtURL:location toURL:tempUrl error:&error];                             // copy to TEMP
                 }
                 
@@ -547,7 +548,7 @@ didFinishDownloadingToURL:(NSURL *)location {
         }
         
         // resume a waiting download.
-        [self startHighestPriorityZADownloadItem];
+        [self _startHighestPriorityZADownloadItem];
     } else {
         // old downloadtask run success when user opens the app.
         // so, it's not exist any DownloadModel in Dictionary.
@@ -555,7 +556,7 @@ didFinishDownloadingToURL:(NSURL *)location {
     }
 }
 
-- (void) URLSession:(NSURLSession *)session
+- (void)URLSession:(NSURLSession *)session
                task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error {
     /// called when user pause, cancle, loss connection,.....
@@ -578,14 +579,14 @@ didCompleteWithError:(NSError *)error {
     
     /// handle erros:
     switch (error.code) {
-        /// canceled/paused a task
+            /// canceled/paused a task
         case -999:
         {
             return;
             break;
         }
             
-        /// No connection.
+            /// No connection.
         case -1009:
         {
             _totalDownloadingUrls--;
@@ -617,7 +618,7 @@ didCompleteWithError:(NSError *)error {
             return;
             break;
         }
-        /// downloading -> timeout request (loss connection).
+            /// downloading -> timeout request (loss connection).
         case -1001:
         {
             /// retry:
@@ -631,7 +632,7 @@ didCompleteWithError:(NSError *)error {
                 });
                 return;
             }
-
+            
             return;
             break;
         }
@@ -640,7 +641,7 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (void) URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
     // notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
     dispatch_async(dispatch_get_main_queue(), ^{
         AppDelegate *appDelegate = (AppDelegate*) UIApplication.sharedApplication.delegate;
@@ -649,9 +650,19 @@ didCompleteWithError:(NSError *)error {
     });
 }
 
+#pragma mark - Observer
+
+- (void)reachabilityChanged:(NSNotification *)note {
+    Reachability* reachability = [note object];
+    NetworkStatus netStatus = [reachability currentReachabilityStatus];     // status of network.
+    if (netStatus == ReachableViaWiFi) {
+        [self _resumeInterruptedDownloads];
+    }
+}
+
 #pragma mark - Private methods
 
-- (NSUInteger)remainingTimeForDownload:(ZACommonDownloadItem*)downloadItem
+- (NSUInteger)_remainingTimeForDownload:(ZACommonDownloadItem*)downloadItem
                        bytesTransferred:(int64_t)bytesTransferred
               totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
     NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:downloadItem.startDate];
@@ -661,20 +672,14 @@ didCompleteWithError:(NSError *)error {
     return (NSUInteger) remainingTime;
 }
 
-- (BOOL)canStartADownloadItem {
-    // can we start a waiting-download.
-    if (_maxConcurrentDownloads == -1 || (self.totalDownloadingUrls < _maxConcurrentDownloads)) {
+- (BOOL)_canStartADownloadItem {
+    if (_maxConcurrentDownloads == NO_LIMIT_CONCURRENT_DOWNLOADS || (self.totalDownloadingUrls < _maxConcurrentDownloads)) {
         return true;
     }
     return false;
 }
 
-- (ZACommonDownloadItem*)getHighestPriorityZADownloadModel {
-    
-    //NSLog(@"dld: Begin to choose highest priority item");
-    
-    //NSLog(@"dld: Before choosing item, HIGH: %lu items, MEDIUM: %lu items, LOW: %lu items",_highPriorityDownloadItems.count,_mediumPriorityDownloadItems.count,_lowPriorityDownloadItems.count);
-    
+- (ZACommonDownloadItem*)_getHighestPriorityZADownloadModel {
     ZACommonDownloadItem *highestPriorityDownloadItem = nil;
     
     highestPriorityDownloadItem = [self.highPriorityDownloadItems firstObject];
@@ -696,10 +701,10 @@ didCompleteWithError:(NSError *)error {
     return nil;
 }
 
-- (void)startHighestPriorityZADownloadItem {
-    if ([self canStartADownloadItem]) {
+- (void)_startHighestPriorityZADownloadItem {
+    if ([self _canStartADownloadItem]) {
         // get max priority downloadmodel:
-        ZACommonDownloadItem *downloadItem = [self getHighestPriorityZADownloadModel];
+        ZACommonDownloadItem *downloadItem = [self _getHighestPriorityZADownloadModel];
         if (downloadItem) {
             self.totalDownloadingUrls++;
             [downloadItem startAllPendingRequestItems];
@@ -707,21 +712,13 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (BOOL)isValidUrl:(NSString *)urlString {
+- (BOOL)_isValidUrl:(NSString *)urlString {
     NSURL *url = [NSURL URLWithString:urlString];
     BOOL isValid = url && [url scheme] && [url host];
     return isValid;
 }
 
-- (void)reachabilityChanged:(NSNotification *)note {
-    Reachability* reachability = [note object];
-    NetworkStatus netStatus = [reachability currentReachabilityStatus];     // status of network.
-    if (netStatus == ReachableViaWiFi) {
-        [self resumeInterruptedDownloads];
-    }
-}
-
-- (void)resumeInterruptedDownloads {
+- (void)_resumeInterruptedDownloads {
     //    for (ZACommonDownloadItem *downloadItem in _downloadItemDict.allValues) {
     //        if (downloadItem.commonState == ZADownloadItemStateInterrupted) {
     //            // [self retryDownloadItem:downloadItem];
@@ -729,7 +726,7 @@ didCompleteWithError:(NSError *)error {
     //    }
 }
 
-- (void)removeAWaitingDownloadItem:(ZACommonDownloadItem*)downloadItem {
+- (void)_removeAWaitingDownloadItem:(ZACommonDownloadItem*)downloadItem {
     switch (downloadItem.commonPriority) {
         case ZADownloadModelPriroityHigh:
             [_highPriorityDownloadItems removeObject:downloadItem];
@@ -743,7 +740,7 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (void)addToPendingList:(ZACommonDownloadItem*)downloadItem {
+- (void)_addToPendingList:(ZACommonDownloadItem*)downloadItem {
     downloadItem.commonState = ZADownloadItemStatePending;               // waiting for download.
     switch (downloadItem.commonPriority) {
         case ZADownloadModelPriroityHigh:
@@ -784,9 +781,9 @@ didCompleteWithError:(NSError *)error {
     return _forcegroundURLSession;
 }
 
-#pragma mark - Private methods: system file logics.
+#pragma mark - Private methods
 
-- (void)createDirectoryWithName:(NSString *)directoryName {
+- (void)_createDirectoryWithName:(NSString *)directoryName {
     NSFileManager *fileManager= [NSFileManager defaultManager];
     NSError *error = nil;
     [fileManager createDirectoryAtURL:[DOCUMENT_URL URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
@@ -806,7 +803,7 @@ didCompleteWithError:(NSError *)error {
 - (NSURL *)getFileUrlWithFileName:(NSString *)fileName directoryName:(NSString *)directoryName {
     NSURL *fileUrl;
     if (directoryName) {
-        [self createDirectoryWithName:directoryName];
+        [self _createDirectoryWithName:directoryName];
         fileUrl = [[DOCUMENT_URL URLByAppendingPathComponent:directoryName] URLByAppendingPathComponent:fileName];
     } else {
         fileUrl = [DOCUMENT_URL URLByAppendingPathComponent:fileName];
