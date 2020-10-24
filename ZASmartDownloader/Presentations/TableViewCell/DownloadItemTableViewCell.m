@@ -100,10 +100,10 @@
 
 #pragma mark - Events
 
-- (void)tappedStartButton:(id)sender {
-    /// Tapped to START/PAUSE/RESUME/RETRY button:
-
-    if ([self.startButton.titleLabel.text isEqualToString:@"START"]) {
+- (void)didTapStartDownloadButton:(id)sender {
+    NSString *buttonTitle = self.startButton.titleLabel.text;
+    
+    if ([buttonTitle isEqualToString:@"START"]) {
         self.cancelButton.enabled = true;
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         NSString *url = self.downloadModel.urlString;
@@ -111,27 +111,36 @@
         NSUInteger retryCount = 3;
 
         ///Start download:
-        _downloadItem = [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url destinationUrl:nil enableBackgroundMode:NO retryCount:retryCount retryInterval:retryInterval priority:_downloadModel.priority progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
+        _downloadItem = [ZADownloadManager.sharedZADownloadManager
+                         downloadFileWithURL:url
+                         destinationUrl:nil
+                         enableBackgroundMode:NO
+                         retryCount:retryCount
+                         retryInterval:retryInterval
+                         priority:_downloadModel.priority
+                         progress:^(CGFloat progress, NSUInteger speed, NSUInteger remainingSeconds) {
+            
             [self.progressView setProgress:progress];
             NSInteger percent = progress*100;
             self.downloadedProgressLabel.text = [[[NSString alloc] initWithFormat:@"DOWNLOADED: %ld",(long)percent] stringByAppendingString:@"%"];
             self.remainingTimeLabel.text = [[NSString alloc] initWithFormat:@"Remaining time: %lu(s)", remainingSeconds];
+            
         } completion:^(NSURL *destinationUrl) {
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                //NSLog(@"dld: on UI, downloaded file: %@",[self.urlLabel.text lastPathComponent]);
                 [self.startButton setTitle:@"DOWNLOADED" forState:UIControlStateNormal];
                 self.startButton.enabled = false;
                 [self.progressView setProgress:1.0];
                 self.downloadedProgressLabel.text = @"100%";
             });
+            
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self logErrorWithCode:error.code];
             });
         }];
-        
-
-    } else if ([self.startButton.titleLabel.text isEqualToString:@"PAUSE"]){
+    }
+    else if ([buttonTitle isEqualToString:@"PAUSE"]){
         // Tapped to PAUSE:
         [ZADownloadManager.sharedZADownloadManager pauseDownloadingOfRequest:_downloadItem];
         [self.startButton setTitle:@"RESUME" forState:UIControlStateNormal];
@@ -139,21 +148,22 @@
         
         
         
-    } else if ([self.startButton.titleLabel.text isEqualToString:@"RESUME"]){
+    }
+    else if ([buttonTitle isEqualToString:@"RESUME"]){
         // Tapped to RESUME
         [ZADownloadManager.sharedZADownloadManager resumeDownloadingOfRequest:_downloadItem];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         //NSLog(@"dld: tapped RESUME, now you can tap button PAUSE");
         
         
-    } else if ([self.startButton.titleLabel.text isEqualToString:@"RETRY"]) {
-        // Tapped to RETRY
+    }
+    else if ([buttonTitle isEqualToString:@"RETRY"]) {
         [ZADownloadManager.sharedZADownloadManager retryDownloadingOfRequestItem:self.downloadItem];
         [self.startButton setTitle:@"PAUSE" forState:UIControlStateNormal];
     }
 }
 
-- (void)cancelDownload:(id)sender {
+- (void)didTapCancelDownload:(id)sender {
     // Tapped CANCEL button
     
     [ZADownloadManager.sharedZADownloadManager cancelDownloadingOfRequest:self.downloadItem];
@@ -244,7 +254,7 @@
         _startButton.layer.cornerRadius = 5.0;
         _startButton.titleLabel.font = [UIFont systemFontOfSize:13];
         [_startButton setTitle:@"START" forState:UIControlStateNormal];
-        [_startButton addTarget:self action:@selector(tappedStartButton:) forControlEvents:UIControlEventTouchUpInside];
+        [_startButton addTarget:self action:@selector(didTapStartDownloadButton:) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_startButton];
     }
     
@@ -260,7 +270,7 @@
         _cancelButton.layer.cornerRadius = 5.0  ;
         _cancelButton.titleLabel.font = [UIFont systemFontOfSize:13];
         [_cancelButton setTitle:@"CANCEL" forState:UIControlStateNormal];
-        [_cancelButton addTarget:self action:@selector(cancelDownload:) forControlEvents:UIControlEventTouchUpInside];
+        [_cancelButton addTarget:self action:@selector(didTapCancelDownload:) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_cancelButton];
     }
     

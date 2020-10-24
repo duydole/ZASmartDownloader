@@ -1,5 +1,5 @@
 //
-//  ZADownloadManager.h
+//  ZASmartDownloader.h
 //  ZASmartDownloader
 //
 //  Created by Do Le Duy on 10/21/20.
@@ -11,8 +11,19 @@
 #import "ZACommonDownloadItem.h"
 #import <UIKit/UIKit.h>
 
-typedef NSString* DownloadRequestId;
-
+/// ZADonwloadManager is built on top of NSURLSession
+/// Support many featues:
+///     - Download files, images and save to custom directory.
+///     - Support download files with priority: HIGH, MEDIUM, LOW
+///     - Optimize download on multithread and only download 1 time if there are many same requests.
+///     - Support checks how many downloading files.
+///     - Support config timeout interval for DownloadManager.
+///     - Support download multiple files at the same time.
+///     - Support start, pause, resume, retry download.
+///     - Support download background or foreground mode.
+///     - Support to set maximum concurrent downloads.
+///     - Support number of retry time and retry time interval when download failed.
+///     - Support to delete file by URL or name and clear all files that have been downloaded. (not yet).
 @interface ZADownloadManager : NSObject
 
 + (ZADownloadManager*)sharedZADownloadManager;
@@ -68,7 +79,7 @@ typedef NSString* DownloadRequestId;
                  completion:(ZADownloadCompletionBlock)completionBlock
                     failure:(ZADownloadErrorBlock)errorBlock;
 
-///  Download a Image with a UrlString
+/// Download a Image with a UrlString
 /// @param urlString url of image
 /// @param completionBlock completion block
 /// @param errorBlock error block
@@ -76,19 +87,19 @@ typedef NSString* DownloadRequestId;
                   completion:(void(^)(UIImage *image, NSURL *destinationUrl))completionBlock
                      failure:(void(^)(NSError* error))errorBlock;
 
-/// Pause download of this Item
+/// PASUSE download of this Item
 /// @param requestItem item which will be paused
 - (void)pauseDownloadingOfRequest:(ZARequestItem *)requestItem;
 
-/// Resume download if this item is paused
+/// RESUME download if this item is paused
 /// @param requestItem item which will be resumed
 - (void)resumeDownloadingOfRequest:(ZARequestItem *)requestItem;
 
-/// Retry download this item
+/// RETRY download this item
 /// @param requestItem item will be retry download
 - (void)retryDownloadingOfRequestItem:(ZARequestItem *)requestItem;
 
-/// Cancel download this item
+/// CANCEL download this item
 /// @param requestItem item will be canceled download
 - (void)cancelDownloadingOfRequest:(ZARequestItem *)requestItem;
 

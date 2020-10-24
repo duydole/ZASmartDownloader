@@ -80,8 +80,8 @@
     }
 }
 
-// resume a Paused DownloadItem with Id and Session (which used to create DownloadTask)
 - (void)resumeDownloadingWithRequestId:(NSString *)identifier urlSession:(NSURLSession *)session {
+    // resume a Paused DownloadItem with Id and Session (which used to create DownloadTask)
     
     ZARequestItem *requestItem = [_requestItemsDict objectForKey:identifier];
     if (!requestItem) {
@@ -173,8 +173,6 @@
     
     [_requestItemsDict removeObjectForKey:requestItem.requestId];
 }
-
-# pragma mark - Private methods
 
 - (void)setRetryCount:(NSUInteger)retryCount {
     _retryCount = retryCount;

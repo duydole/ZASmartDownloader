@@ -1,5 +1,5 @@
 //
-//  ZADownloadManager.m
+//  ZASmartDownloader.m
 //  ZASmartDownloader
 //
 //  Created by Do Le Duy on 10/21/20.
@@ -34,9 +34,9 @@
 @property (nonatomic, strong) NSMutableDictionary *backgroundDownloadItemsDict;
 @property (nonatomic, strong) NSMutableDictionary *foregroundDownloadItemsDict;
 
-@property (nonatomic, strong) NSMutableArray *highPriorityDownloadItems;
-@property (nonatomic, strong) NSMutableArray *mediumPriorityDownloadItems;
-@property (nonatomic, strong) NSMutableArray *lowPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray<ZACommonDownloadItem *> *highPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray<ZACommonDownloadItem *> *mediumPriorityDownloadItems;
+@property (nonatomic, strong) NSMutableArray<ZACommonDownloadItem *> *lowPriorityDownloadItems;
 
 @end
 
@@ -218,7 +218,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     NSAssert(retryCount >= 0 && retryInterval >= 0, @"");
     
     /// Check URLString
-    ifnot ([self _isValidUrl:urlString]) {
+    ifnot ([self _isValidUrlString:urlString]) {
         if (errorBlock) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeInvalidUrl userInfo:nil];
@@ -441,7 +441,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         
         // remove Item out of WaitingLists.
         if (downloadItem.commonState == ZADownloadItemStatePending) {
-            [self _removeAWaitingDownloadItem:downloadItem];
+            [self _removePendingDownloadItem:downloadItem];
         }
         
         // resume a waiting downloadmodel.
@@ -662,14 +662,14 @@ didCompleteWithError:(NSError *)error {
 
 #pragma mark - Private methods
 
-- (NSUInteger)_remainingTimeForDownload:(ZACommonDownloadItem*)downloadItem
-                       bytesTransferred:(int64_t)bytesTransferred
-              totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:downloadItem.startDate];
-    CGFloat speed = (CGFloat)bytesTransferred / (CGFloat)timeInterval;
-    CGFloat remainingBytes = totalBytesExpectedToWrite - bytesTransferred;
-    CGFloat remainingTime = remainingBytes / speed;
-    return (NSUInteger) remainingTime;
+- (ZACommonDownloadItem *)_getZACommonDownloadItemWithRequestItem:(ZARequestItem *)requestItem {
+    ZACommonDownloadItem *item = nil;
+    if (requestItem.backgroundMode) {
+        item = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
+    } else {
+        item = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
+    }
+    return  item;
 }
 
 - (BOOL)_canStartADownloadItem {
@@ -679,7 +679,7 @@ didCompleteWithError:(NSError *)error {
     return false;
 }
 
-- (ZACommonDownloadItem*)_getHighestPriorityZADownloadModel {
+- (ZACommonDownloadItem *)_getHighestPriorityZADownloadModel {
     ZACommonDownloadItem *highestPriorityDownloadItem = nil;
     
     highestPriorityDownloadItem = [self.highPriorityDownloadItems firstObject];
@@ -712,21 +712,11 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (BOOL)_isValidUrl:(NSString *)urlString {
-    NSURL *url = [NSURL URLWithString:urlString];
-    BOOL isValid = url && [url scheme] && [url host];
-    return isValid;
-}
-
 - (void)_resumeInterruptedDownloads {
-    //    for (ZACommonDownloadItem *downloadItem in _downloadItemDict.allValues) {
-    //        if (downloadItem.commonState == ZADownloadItemStateInterrupted) {
-    //            // [self retryDownloadItem:downloadItem];
-    //        }
-    //    }
+    /// TODO:
 }
 
-- (void)_removeAWaitingDownloadItem:(ZACommonDownloadItem*)downloadItem {
+- (void)_removePendingDownloadItem:(ZACommonDownloadItem*)downloadItem {
     switch (downloadItem.commonPriority) {
         case ZADownloadModelPriroityHigh:
             [_highPriorityDownloadItems removeObject:downloadItem];
@@ -740,8 +730,9 @@ didCompleteWithError:(NSError *)error {
     }
 }
 
-- (void)_addToPendingList:(ZACommonDownloadItem*)downloadItem {
-    downloadItem.commonState = ZADownloadItemStatePending;               // waiting for download.
+- (void)_addToPendingList:(ZACommonDownloadItem *)downloadItem {
+    downloadItem.commonState = ZADownloadItemStatePending;
+    
     switch (downloadItem.commonPriority) {
         case ZADownloadModelPriroityHigh:
             [self.highPriorityDownloadItems addObject:downloadItem];
@@ -781,45 +772,23 @@ didCompleteWithError:(NSError *)error {
     return _forcegroundURLSession;
 }
 
-#pragma mark - Private methods
+#pragma mark - Helper
 
-- (void)_createDirectoryWithName:(NSString *)directoryName {
-    NSFileManager *fileManager= [NSFileManager defaultManager];
-    NSError *error = nil;
-    [fileManager createDirectoryAtURL:[DOCUMENT_URL URLByAppendingPathComponent:directoryName] withIntermediateDirectories:true attributes:nil error:&error];
+- (BOOL)_isValidUrlString:(NSString *)urlString {
+    NSURL *url = [NSURL URLWithString:urlString];
+    BOOL isValid = url && [url scheme] && [url host];
+    return isValid;
 }
 
-- (BOOL)isExistedFileName:(NSString *)fileName inDirectory:(NSURL *)directoryUrl {
-    NSURL *fileURL;
-    
-    if (fileName) {
-        fileURL = [directoryUrl URLByAppendingPathComponent:fileName];
-    }
-    
-    NSError *error = nil;
-    return [fileURL checkResourceIsReachableAndReturnError:&error];
-}
+- (NSUInteger)_remainingTimeForDownload:(ZACommonDownloadItem *)downloadItem
+                       bytesTransferred:(int64_t)bytesTransferred
+              totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:downloadItem.startDate];
+    CGFloat speed = (CGFloat)bytesTransferred / (CGFloat)timeInterval;
+    CGFloat remainingBytes = totalBytesExpectedToWrite - bytesTransferred;
+    CGFloat remainingTime = remainingBytes / speed;
 
-- (NSURL *)getFileUrlWithFileName:(NSString *)fileName directoryName:(NSString *)directoryName {
-    NSURL *fileUrl;
-    if (directoryName) {
-        [self _createDirectoryWithName:directoryName];
-        fileUrl = [[DOCUMENT_URL URLByAppendingPathComponent:directoryName] URLByAppendingPathComponent:fileName];
-    } else {
-        fileUrl = [DOCUMENT_URL URLByAppendingPathComponent:fileName];
-    }
-    return fileUrl;
+    return (NSUInteger)remainingTime;
 }
-
-- (ZACommonDownloadItem *)_getZACommonDownloadItemWithRequestItem:(ZARequestItem *)requestItem {
-    ZACommonDownloadItem *item = nil;
-    if (requestItem.backgroundMode) {
-        item = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-    } else {
-        item = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-    }
-    return  item;
-}
-
 
 @end

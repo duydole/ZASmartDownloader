@@ -10,6 +10,13 @@
 
 @implementation NSFileManager (Extension)
 
++ (void)createDirectoryAtDocumentsWithName:(NSString *)directoryName {
+    [NSFileManager.defaultManager createDirectoryAtURL:[self.documentsURL URLByAppendingPathComponent:directoryName]
+                           withIntermediateDirectories:true
+                                            attributes:nil
+                                                 error:nil];
+}
+
 + (NSURL *)documentsURL {
     NSURL *url = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
                                                       inDomain:NSUserDomainMask

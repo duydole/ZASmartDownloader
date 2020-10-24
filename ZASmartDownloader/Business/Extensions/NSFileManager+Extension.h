@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSFileManager (Extension)
 
++ (void)createDirectoryAtDocumentsWithName:(NSString *)directoryName;
 + (NSURL *)documentsURL;
 + (NSURL *)tempURL;
 
