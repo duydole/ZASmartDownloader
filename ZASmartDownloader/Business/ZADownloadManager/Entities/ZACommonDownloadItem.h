@@ -4,10 +4,10 @@
 
 @class ZARequestItem;
 
-// ZACommonDownloadItem manage dictionary of ZARequestItems (has the same UrlString).
+/// ZACommonDownloadItem là Object dùng để quản lý tất cả các request download (ZARequestItems) mà cùng download 1 file (trùng urlString)
 @interface ZACommonDownloadItem : NSObject
 
-@property NSMutableDictionary <NSString*,ZARequestItem*> *requestItemsDict;
+@property NSMutableDictionary <NSString *,ZARequestItem *> *requestItemsDict;
 @property (nonatomic, readonly) NSUInteger totalDownloadingSubItems;
 @property (strong, nonatomic) NSURLSessionDownloadTask *commonDownloadTask;
 @property (nonatomic) BOOL backgroundMode;
@@ -19,15 +19,15 @@
 @property (nonatomic) NSUInteger retryInterval;
 
 - (instancetype)initWithRequestItem:(ZARequestItem*)requestItem;
-- (void)addRequestItem:(ZARequestItem*)requestItem;
-- (void)removeARequestItem:(ZARequestItem*)requestItem;
-- (void)startDownloadingRequest:(NSString*)requestId;
+- (void)addRequestItem:(ZARequestItem *)requestItem;
+- (void)removeARequestItem:(ZARequestItem *)requestItem;
+- (void)startDownloadingRequest:(NSString *)requestId;
 - (void)startDownloadingAllRequests;
 - (void)startAllPendingRequestItems;
 - (void)pauseAlls;
-- (void)pauseDownloadingWithRequestId:(NSString*)requestId;
-- (void)resumeDownloadingWithRequestId:(NSString*)requestId urlSession:(NSURLSession*)session;
-- (void)cancelDownloadingWithRequestId:(NSString*)requestId;
+- (void)pauseDownloadingWithRequestId:(NSString *)requestId;
+- (void)resumeDownloadingWithRequestId:(NSString *)requestId urlSession:(NSURLSession*)session;
+- (void)cancelDownloadingWithRequestId:(NSString *)requestId;
 - (void)resetRetryCount;
 
 @end

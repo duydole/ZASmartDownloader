@@ -105,13 +105,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     }
     
     /// Create RequestItem (subModel):
-    ZARequestItem *requestItem = [[ZARequestItem alloc] initWithUrlString:urlString
-                                                         isBackgroundMode:backgroundMode
-                                                           destinationUrl:destinationUrl
-                                                                 priority:priority
-                                                                 progress:progressBlock
-                                                               completion:completionBlock
-                                                                  failure:errorBlock];
+    ZARequestItem *requestItem = [[ZARequestItem alloc]
+                                  initWithUrlString:urlString
+                                  isBackgroundMode:backgroundMode
+                                  destinationUrl:destinationUrl
+                                  priority:priority
+                                  progress:progressBlock
+                                  completion:completionBlock
+                                  failure:errorBlock];
     
     /// Start to Download:
     [self downloadFileWithRequestItem:requestItem retryCount:retryCount retryInterval:retryInterval];
@@ -150,46 +151,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                       failure:errorBlock];
 }
 
-- (void)downloadImageWithUrl:(NSString *)urlString
-                  completion:(void (^)(UIImage *, NSURL *))completionBlock
-                     failure:(void (^)(NSError *))errorBlock {
-    
-    /// Check Image-Cache và return nếu có
-    UIImage *cachedImage = [LDImageCache.shared getImageById:urlString];
-    if (cachedImage) {
-        NSLog(@"dld: existed in Image cache. I'll forward for you.");
-        if (completionBlock) {
-            completionBlock(cachedImage,nil);
-        }
-        return;
-    }
-    
-    /// Nếu cache không có thì gọi download thôi:
-    NSString *directoryName = IMAGE_DIRECTORY_NAME;
-    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
-        /// Load imageDownload được lên và cache lại:
-        UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
-        
-        /// Cache downloadedImage
-        if (downloadedImage) {
-            [LDImageCache.shared cacheImage:downloadedImage byId:urlString];
-            if (completionBlock) {
-                completionBlock(downloadedImage,destinationUrl);
-            }
-        }
-    } failure:^(NSError *error) {
-        if (errorBlock) {
-            errorBlock(error);
-        }
-    }];
-}
-
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem
                          retryCount:(NSUInteger)retryCount
                       retryInterval:(NSUInteger)retryInterval {
     dispatch_async(_serialQueue, ^{
         
-        /// Nếu item này đã tải xong và nằm trong thư mục TEMP thì copy đến DestinationDirectory
+        /// Nếu item này đã tải xong và nằm trong thư mục TEMP thì copy đến destinationDirectory
         /// Sau đó bắn completion và return
         if (requestItem.isExistedOnTempDirectory) {
             NSURL *tempFileUrl = [TEMP_URL URLByAppendingPathComponent:requestItem.fileName];
@@ -204,16 +171,23 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         }
         
         /// Nếu item chưa nằm trong TEMP
-        /// Check thử item này đã được download rồi và nằm chỗ nào đó hay chưa.
+        /// Check thử item này đã được download rồi, hoặc đang download, hoặc đã được push vào queue hay chưa
         ZACommonDownloadItem *existedDownloadItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
         
         /// Nếu item mày muốn download đã tồn tại rồi (đang download or somethingelse)
         if (existedDownloadItem) {
             
-            ///State hiện tại của item này là:
+            /// Nếu commonItem đã tồn tại rồi, thì update lại commonPriority
+            if (requestItem.priority > existedDownloadItem.commonPriority) {
+                existedDownloadItem.commonPriority = requestItem.priority;
+            }
+            
+            /// Tùy vào commonState mà handle khác nhau:
             switch (existedDownloadItem.commonState) {
                 case ZADownloadItemStateDownloading:
                 {
+                    /// Nếu common item đang download thì subItem chỉ cần mark nó đang download là được
+                    /// Add nó vào commonItem đợi khi nào common item download xong nó sẽ foward lại cho all subitems.
                     requestItem.state = ZADownloadItemStateDownloading;
                     [existedDownloadItem addRequestItem:requestItem];
                     return;
@@ -222,27 +196,30 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                     
                 case ZADownloadItemStatePaused:
                 {
-                    /// Nếu không thể resume:
-                    ifnot ([self _canStartADownloadItem]) {
-                        /// Chuyển cả MODEL + subModel -> Pending
-                        requestItem.state = ZADownloadItemStatePending;
-                        existedDownloadItem.commonState = ZADownloadItemStatePending;
-                        [existedDownloadItem addRequestItem:requestItem];
-                        
-                        /// Nếu priority của subModel > Model
-                        if (requestItem.priority>existedDownloadItem.commonPriority) {
-                            existedDownloadItem.commonPriority = requestItem.priority;
-                            [self _addToPendingList:existedDownloadItem];
-                        }
-                    } else {
+                    /// Nếu commonItem đang pause mà có 1 subItem cần download
+                    /// Thì check coi có thể start được 1 downloadTask hay không
+                    if ([self _canStartADownloadItem]) {
+                        /// Nếu có thể start 1 downloadTask thì giả bộ add 1 paused-subitem vào commonItem
                         requestItem.state = ZADownloadItemStatePaused;
                         [existedDownloadItem addRequestItem:requestItem];
                         
+                        /// Sau đó resume commonItem with subItem-Id
                         if (requestItem.backgroundMode) {
                             [existedDownloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.backgroundURLSession];
                         } else {
                             [existedDownloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.forcegroundURLSession];
                         }
+                    } else {
+                        
+                        ///Nếu manager không cho phép start 1 download mới mà subItem đòi download
+                        /// Thì add subItem vào pending queue
+                        /// Update lại data cho commonItem và subitem trước
+                        requestItem.state = ZADownloadItemStatePending;
+                        existedDownloadItem.commonState = ZADownloadItemStatePending;
+                        [existedDownloadItem addRequestItem:requestItem];
+                                                
+                        ///Add vào pending list
+                        [self _addToPendingList:existedDownloadItem];
                     }
                     
                     break;
@@ -250,9 +227,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                     
                 case ZADownloadItemStatePending:
                 {
-                    if (requestItem.priority > existedDownloadItem.commonPriority) {
-                        existedDownloadItem.commonPriority = requestItem.priority;
-                    }
+                    /// Nếu commonItem đang nằm trong pendingList:
+                    /// Thì đổi state thành pending thôi, add subItem vào commonItem
                     requestItem.state = ZADownloadItemStatePending;
                     [existedDownloadItem addRequestItem:requestItem];
                     break;
@@ -263,6 +239,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                     break;
             }
             
+            /// Thấy chỗ này sai sai rầu
+            /// Để viết unit test rồi sửa lại chỗ này sau
             /// StartDownload hoặc add vào list pending tương ứng
             if ([self _canStartADownloadItem]) {
                 self.totalDownloadingUrls++;
@@ -273,18 +251,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             
         } else {
             /// Trường hợp ITEM mới tinh, chưa download lần nào:
+            /// Create DownloadTask for CommonDownloadnItem.
+            NSURLSessionDownloadTask *downloadTask = [self _downloadTaskWithRequestItem:requestItem];
+            
             /// Create new CommonDownloadItem:
             ZACommonDownloadItem *commonDownloadItem = [[ZACommonDownloadItem alloc] initWithRequestItem:requestItem];
-            
-            /// Create DownloadTask for CommonDownloadnItem.
-            NSURL *url = [NSURL URLWithString:requestItem.urlString];
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-            NSURLSessionDownloadTask *downloadTask;
-            if (requestItem.backgroundMode) {
-                downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
-            } else {
-                downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
-            }
             commonDownloadItem.commonDownloadTask = downloadTask;
             commonDownloadItem.retryCount = retryCount;
             commonDownloadItem.retryInterval = retryInterval;
@@ -307,6 +278,43 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
     });
 }
 
+- (void)downloadImageWithUrl:(NSString *)urlString
+                  completion:(void (^)(UIImage *, NSURL *))completionBlock
+                     failure:(void (^)(NSError *))errorBlock {
+    
+    /// Check LDImageCache và return nếu có
+    UIImage *cachedImage = [LDImageCache.shared getImageById:urlString];
+    if (cachedImage) {
+        ifnot (completionBlock) return;
+        completionBlock(cachedImage,nil);
+        return;
+    }
+    
+    /// Nếu cache không có thì gọi download thôi:
+    NSString *directoryName = IMAGE_DIRECTORY_NAME;
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString
+                                                     directoryName:directoryName
+                                              enableBackgroundMode:NO
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl) {
+        /// Load imageDownload được lên và cache lại:
+        UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
+        
+        /// Cache downloadedImage
+        if (downloadedImage) {
+            [LDImageCache.shared cacheImage:downloadedImage byId:urlString];
+            if (completionBlock) {
+                completionBlock(downloadedImage,destinationUrl);
+            }
+        }
+    } failure:^(NSError *error) {
+        if (errorBlock) {
+            errorBlock(error);
+        }
+    }];
+}
+
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem {
     [self downloadFileWithRequestItem:requestItem
                            retryCount:DEFAULT_RETRY_COUNT
@@ -315,47 +323,41 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 - (void)pauseDownloadingOfRequest:(ZARequestItem *)requestItem {
     dispatch_async(_serialQueue, ^{
-        // 1. Get CommonDownloadItem will be paused.
-        ZACommonDownloadItem *downloadItem = nil;
-        if (requestItem.backgroundMode) {
-            downloadItem = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-        } else {
-            downloadItem = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-        }
         
-        // 2. Pause subModel with Identifier.
-        [downloadItem pauseDownloadingWithRequestId:requestItem.requestId];
+        /// Get CommonDownloadItem will be paused.
+        ZACommonDownloadItem *commonItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
+        NSAssert(commonItem != nil, @"requestItem is not existed in queue");
         
-        // resume 1 waiting download with highest priority.
-        if (downloadItem.totalDownloadingSubItems == 0) {
+        /// Pause subItem with Identifier.
+        [commonItem pauseDownloadingWithRequestId:requestItem.requestId];
+        
+        ///Nếu commonItem cũng bị pause theo, thì giảm totalDownloadingUrls
+        if (commonItem.totalDownloadingSubItems == 0) {
             self.totalDownloadingUrls--;
-            NSLog(@"dld: paused all subModels, total downloading urls: %lu",self.totalDownloadingUrls);
         }
         
+        ///Start 1 thằng đang pending nếu được
         [self _startHighestPriorityZADownloadItem];
     });
 }
 
 - (void)resumeDownloadingOfRequest:(ZARequestItem *)requestItem {
     dispatch_async(_serialQueue, ^{
-        // if can resume
         if ([self _canStartADownloadItem]) {
-            // 1. Get MODEL you want to RESUME.
-            ZACommonDownloadItem *commonDownloadItem = nil;
-            if (requestItem.backgroundMode) {
-                commonDownloadItem = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-            } else {
-                commonDownloadItem = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-            }
+            /// Nếu queue đang free và có thể start resume
+            /// Get commonItem:
+            ZACommonDownloadItem *commonDownloadItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
             
-            // 2. Resume:
+            /// Resume
             if (commonDownloadItem.backgroundMode) {
                 [commonDownloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.backgroundURLSession];
             } else {
                 [commonDownloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.forcegroundURLSession];
             }
         } else {
-            // if over max concurrent.
+            /// Bắn error như vầy là sai rồi
+            /// TODO: fix it
+            /// if over max concurrent.
             ZADownloadErrorBlock errorBlock = requestItem.errorBlock;
             NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeOverMaxConcurrentDownloads userInfo:nil];
             dispatch_async(self.concurrentQueue, ^{
@@ -366,20 +368,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 }
 
 - (void)retryDownloadingOfRequestItem:(ZARequestItem *)requestItem {
-    /// retry download of 1 REQUEST ITEM:
     
-    // 1. Get CommonDownloadItem will be Retry.
-    ZACommonDownloadItem *downloadItem = nil;
-    if (requestItem.backgroundMode) {
-        downloadItem = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-    } else {
-        downloadItem = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-    }
+    /// Get CommonDownloadItem will be Retry.
+    ZACommonDownloadItem *downloadItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
     
-    // if DownloadItem has ResumeData
     if (downloadItem.commonResumeData) {
-        [self resumeDownloadingOfRequest: requestItem];
+        [self resumeDownloadingOfRequest:requestItem];
     } else {
+        /// Nếu không có resumeData
         _totalDownloadingUrls++;
         if (requestItem.backgroundMode) {
             [downloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.backgroundURLSession];
@@ -392,20 +388,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 - (void)cancelDownloadingOfRequest:(ZARequestItem *)requestItem {
     dispatch_async(_serialQueue, ^{
         
-        // get MODEL:
-        ZACommonDownloadItem *downloadItem = nil;
-        if (requestItem.backgroundMode) {
-            downloadItem = [self.backgroundDownloadItemsDict objectForKey:requestItem.urlString];
-        } else {
-            downloadItem = [self.foregroundDownloadItemsDict objectForKey:requestItem.urlString];
-        }
+        /// Cancel common item
+        ZACommonDownloadItem *commonItem = [self _getZACommonDownloadItemWithRequestItem:requestItem];
+        [commonItem cancelDownloadingWithRequestId:requestItem.requestId];
         
-        // CANCEL:
-        [downloadItem cancelDownloadingWithRequestId:requestItem.requestId];
-        
-        if (downloadItem.requestItemsDict.count == 0) {
+        /// TODO: Refactor
+        if (commonItem.requestItemsDict.count == 0) {
             
-            if (downloadItem.commonState == ZADownloadItemStateDownloading) {
+            if (commonItem.commonState == ZADownloadItemStateDownloading) {
                 self.totalDownloadingUrls--;
             }
             
@@ -416,12 +406,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
             }
         }
         
-        // remove Item out of WaitingLists.
-        if (downloadItem.commonState == ZADownloadItemStatePending) {
-            [self _removePendingDownloadItem:downloadItem];
+        /// Remove Item out of WaitingLists.
+        if (commonItem.commonState == ZADownloadItemStatePending) {
+            [self _removePendingDownloadItem:commonItem];
         }
         
-        // resume a waiting downloadmodel.
+        /// Resume a waiting downloadmodel.
         [self _startHighestPriorityZADownloadItem];
     });
 }
@@ -619,7 +609,7 @@ didCompleteWithError:(NSError *)error {
 }
 
 - (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
-    // notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
+    /// notify when all task downloads is done in backgrounds, move files done, forward completionCallbacks done.
     dispatch_async(dispatch_get_main_queue(), ^{
         AppDelegate *appDelegate = (AppDelegate*) UIApplication.sharedApplication.delegate;
         appDelegate.backgroundSessionCompleteHandler();
@@ -631,7 +621,7 @@ didCompleteWithError:(NSError *)error {
 
 - (void)reachabilityChanged:(NSNotification *)note {
     Reachability* reachability = [note object];
-    NetworkStatus netStatus = [reachability currentReachabilityStatus];     // status of network.
+    NetworkStatus netStatus = [reachability currentReachabilityStatus];
     if (netStatus == ReachableViaWiFi) {
         [self _resumeInterruptedDownloads];
     }
@@ -641,9 +631,8 @@ didCompleteWithError:(NSError *)error {
 
 - (void)_retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem withUrlString:(NSString *)urlString {
     if (commonDownloadItem.commonResumeData) {
-        
+        /// TODO: ???
     } else {
-        
         [commonDownloadItem.commonDownloadTask cancel];
         
         NSURL *url = [NSURL URLWithString:urlString];
@@ -703,7 +692,6 @@ didCompleteWithError:(NSError *)error {
 
 - (void)_startHighestPriorityZADownloadItem {
     if ([self _canStartADownloadItem]) {
-        // get max priority downloadmodel:
         ZACommonDownloadItem *downloadItem = [self _getHighestPriorityZADownloadModel];
         if (downloadItem) {
             self.totalDownloadingUrls++;
@@ -713,7 +701,7 @@ didCompleteWithError:(NSError *)error {
 }
 
 - (void)_resumeInterruptedDownloads {
-    /// TODO:
+    /// TODO: complete it
 }
 
 - (void)_removePendingDownloadItem:(ZACommonDownloadItem*)downloadItem {
@@ -789,6 +777,18 @@ didCompleteWithError:(NSError *)error {
     CGFloat remainingTime = remainingBytes / speed;
 
     return (NSUInteger)remainingTime;
+}
+
+- (NSURLSessionDownloadTask *)_downloadTaskWithRequestItem:(ZARequestItem *)requestItem {
+    NSURL *url = [NSURL URLWithString:requestItem.urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    NSURLSessionDownloadTask *downloadTask;
+    if (requestItem.backgroundMode) {
+        downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
+    } else {
+        downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
+    }
+    return downloadTask;
 }
 
 @end
