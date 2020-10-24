@@ -29,7 +29,7 @@
 + (ZADownloadManager*)sharedZADownloadManager;
 
 /// Maximum Concurrent downloadTasks
-/// Defautl: maxConcurrentDownloads = -1, no limit the concurrent downloadtasks.
+/// Defautl: maxConcurrentDownloads = -1, no limit the concurrent downloadtasks._retryDownloadingOfCommonDownloadItem
 @property (nonatomic, assign) NSInteger maxConcurrentDownloads;
 @property (nonatomic, assign) NSUInteger timeoutIntervalForRequest;
 @property (nonatomic, readonly) NSUInteger numberOfDownloadingUrls;

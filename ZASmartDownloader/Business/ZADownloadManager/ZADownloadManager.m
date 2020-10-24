@@ -77,6 +77,113 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
 
 #pragma mark - Public methods
 
+- (ZARequestItem *)downloadFileWithURL:(NSString *)urlString
+                        destinationUrl:(NSURL *)destinationUrl
+                  enableBackgroundMode:(BOOL)backgroundMode
+                            retryCount:(NSUInteger)retryCount
+                         retryInterval:(NSUInteger)retryInterval
+                              priority:(ZADownloadModelPriroity)priority
+                              progress:(ZADownloadProgressBlock)progressBlock
+                            completion:(ZADownloadCompletionBlock)completionBlock
+                               failure:(ZADownloadErrorBlock)errorBlock {
+    NSAssert(retryCount >= 0 && retryInterval >= 0, @"");
+    
+    /// Check URLString
+    ifnot ([self _isValidUrlString:urlString]) {
+        if (errorBlock) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeInvalidUrl userInfo:nil];
+                errorBlock(error);
+            });
+        }
+        return nil;
+    }
+    
+    /// Check DestinationUrl
+    ifnot (destinationUrl) {
+        destinationUrl = [DOCUMENT_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
+    }
+    
+    /// Create RequestItem (subModel):
+    ZARequestItem *requestItem = [[ZARequestItem alloc] initWithUrlString:urlString
+                                                         isBackgroundMode:backgroundMode
+                                                           destinationUrl:destinationUrl
+                                                                 priority:priority
+                                                                 progress:progressBlock
+                                                               completion:completionBlock
+                                                                  failure:errorBlock];
+    
+    /// Start to Download:
+    [self downloadFileWithRequestItem:requestItem retryCount:retryCount retryInterval:retryInterval];
+    
+    return requestItem;
+}
+
+- (void)downloadFileWithURL:(NSString *)urlString
+              directoryName:(NSString *)directoryName
+       enableBackgroundMode:(BOOL)backgroundMode
+                   priority:(ZADownloadModelPriroity)priority
+                   progress:(ZADownloadProgressBlock)progressBlock
+                 completion:(ZADownloadCompletionBlock)completionBlock
+                    failure:(ZADownloadErrorBlock)errorBlock {
+    [self downloadFileWithURL:urlString
+               destinationUrl:nil
+         enableBackgroundMode:backgroundMode
+                   retryCount:DEFAULT_RETRY_COUNT
+                retryInterval:DEFAULT_RETRY_INTERVAL
+                     priority:priority
+                     progress:progressBlock
+                   completion:completionBlock
+                      failure:errorBlock];
+}
+
+- (void)downloadFileWithURL:(NSString *)urlString
+                   progress:(ZADownloadProgressBlock)progressBlock
+                 completion:(ZADownloadCompletionBlock)completionBlock
+                    failure:(ZADownloadErrorBlock)errorBlock {
+    [self downloadFileWithURL:urlString
+                directoryName:nil
+         enableBackgroundMode:YES
+                     priority:ZADownloadModelPriroityMedium
+                     progress:progressBlock
+                   completion:completionBlock
+                      failure:errorBlock];
+}
+
+- (void)downloadImageWithUrl:(NSString *)urlString
+                  completion:(void (^)(UIImage *, NSURL *))completionBlock
+                     failure:(void (^)(NSError *))errorBlock {
+    
+    /// Check Image-Cache và return nếu có
+    UIImage *cachedImage = [LDImageCache.shared getImageById:urlString];
+    if (cachedImage) {
+        NSLog(@"dld: existed in Image cache. I'll forward for you.");
+        if (completionBlock) {
+            completionBlock(cachedImage,nil);
+        }
+        return;
+    }
+    
+    /// Nếu cache không có thì gọi download thôi:
+    NSString *directoryName = IMAGE_DIRECTORY_NAME;
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
+        /// Load imageDownload được lên và cache lại:
+        UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
+        
+        /// Cache downloadedImage
+        if (downloadedImage) {
+            [LDImageCache.shared cacheImage:downloadedImage byId:urlString];
+            if (completionBlock) {
+                completionBlock(downloadedImage,destinationUrl);
+            }
+        }
+    } failure:^(NSError *error) {
+        if (errorBlock) {
+            errorBlock(error);
+        }
+    }];
+}
+
 - (void)downloadFileWithRequestItem:(ZARequestItem *)requestItem
                          retryCount:(NSUInteger)retryCount
                       retryInterval:(NSUInteger)retryInterval {
@@ -206,113 +313,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                         retryInterval:DEFAULT_RETRY_INTERVAL];
 }
 
-- (ZARequestItem *)downloadFileWithURL:(NSString *)urlString
-                        destinationUrl:(NSURL *)destinationUrl
-                  enableBackgroundMode:(BOOL)backgroundMode
-                            retryCount:(NSUInteger)retryCount
-                         retryInterval:(NSUInteger)retryInterval
-                              priority:(ZADownloadModelPriroity)priority
-                              progress:(ZADownloadProgressBlock)progressBlock
-                            completion:(ZADownloadCompletionBlock)completionBlock
-                               failure:(ZADownloadErrorBlock)errorBlock {
-    NSAssert(retryCount >= 0 && retryInterval >= 0, @"");
-    
-    /// Check URLString
-    ifnot ([self _isValidUrlString:urlString]) {
-        if (errorBlock) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *error = [[NSError alloc] initWithDomain:@"duydl.DownloadManagerDomain" code:DownloadErrorCodeInvalidUrl userInfo:nil];
-                errorBlock(error);
-            });
-        }
-        return nil;
-    }
-    
-    /// Check DestinationUrl
-    ifnot (destinationUrl) {
-        destinationUrl = [DOCUMENT_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
-    }
-    
-    /// Create RequestItem (subModel):
-    ZARequestItem *requestItem = [[ZARequestItem alloc] initWithUrlString:urlString
-                                                         isBackgroundMode:backgroundMode
-                                                           destinationUrl:destinationUrl
-                                                                 priority:priority
-                                                                 progress:progressBlock
-                                                               completion:completionBlock
-                                                                  failure:errorBlock];
-    
-    /// Start to Download:
-    [self downloadFileWithRequestItem:requestItem retryCount:retryCount retryInterval:retryInterval];
-    
-    return requestItem;
-}
-
-- (void)downloadFileWithURL:(NSString *)urlString
-              directoryName:(NSString *)directoryName
-       enableBackgroundMode:(BOOL)backgroundMode
-                   priority:(ZADownloadModelPriroity)priority
-                   progress:(ZADownloadProgressBlock)progressBlock
-                 completion:(ZADownloadCompletionBlock)completionBlock
-                    failure:(ZADownloadErrorBlock)errorBlock {
-    [self downloadFileWithURL:urlString
-               destinationUrl:nil
-         enableBackgroundMode:backgroundMode
-                   retryCount:DEFAULT_RETRY_COUNT
-                retryInterval:DEFAULT_RETRY_INTERVAL
-                     priority:priority
-                     progress:progressBlock
-                   completion:completionBlock
-                      failure:errorBlock];
-}
-
-- (void)downloadFileWithURL:(NSString *)urlString
-                   progress:(ZADownloadProgressBlock)progressBlock
-                 completion:(ZADownloadCompletionBlock)completionBlock
-                    failure:(ZADownloadErrorBlock)errorBlock {
-    [self downloadFileWithURL:urlString
-                directoryName:nil
-         enableBackgroundMode:YES
-                     priority:ZADownloadModelPriroityMedium
-                     progress:progressBlock
-                   completion:completionBlock
-                      failure:errorBlock];
-}
-
-- (void)downloadImageWithUrl:(NSString *)urlString
-                  completion:(void (^)(UIImage *, NSURL *))completionBlock
-                     failure:(void (^)(NSError *))errorBlock {
-    
-    /// Check Image-Cache và return nếu có
-    UIImage *cachedImage = [LDImageCache.shared getImageById:urlString];
-    if (cachedImage) {
-        NSLog(@"dld: existed in Image cache. I'll forward for you.");
-        if (completionBlock) {
-            completionBlock(cachedImage,nil);
-        }
-        return;
-    }
-    
-    /// Nếu cache không có thì gọi download thôi:
-    NSString *directoryName = IMAGE_DIRECTORY_NAME;
-    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString directoryName:directoryName enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:^(NSURL *destinationUrl) {
-        /// Load imageDownload được lên và cache lại:
-        UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:destinationUrl]];
-        
-        /// Cache downloadedImage
-        if (downloadedImage) {
-            [LDImageCache.shared cacheImage:downloadedImage byId:urlString];
-            if (completionBlock) {
-                completionBlock(downloadedImage,destinationUrl);
-            }
-        }
-    } failure:^(NSError *error) {
-        if (errorBlock) {
-            errorBlock(error);
-        }
-    }];
-}
-
 - (void)pauseDownloadingOfRequest:(ZARequestItem *)requestItem {
     dispatch_async(_serialQueue, ^{
         // 1. Get CommonDownloadItem will be paused.
@@ -386,29 +386,6 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
         } else {
             [downloadItem resumeDownloadingWithRequestId:requestItem.requestId urlSession:self.forcegroundURLSession];
         }
-    }
-}
-
-- (void)retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem withUrlString:(NSString *)urlString {
-    if (commonDownloadItem.commonResumeData) {
-        
-    } else {
-        
-        [commonDownloadItem.commonDownloadTask cancel];
-        
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        NSURLSessionDownloadTask *downloadTask;
-        
-        if (commonDownloadItem.backgroundMode) {
-            downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
-        } else {
-            downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
-        }
-        
-        commonDownloadItem.commonDownloadTask = downloadTask;
-        _totalDownloadingUrls++;
-        [commonDownloadItem startDownloadingAllRequests];
     }
 }
 
@@ -597,7 +574,7 @@ didCompleteWithError:(NSError *)error {
                 NSLog(@"dld: No connection,retryInterval: %lu, remaining retries: %lu",commonDownloadItem.retryInterval,commonDownloadItem.retryCount);
                 commonDownloadItem.retryCount--;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(commonDownloadItem.retryInterval * NSEC_PER_SEC)), _serialQueue, ^{
-                    [self retryDownloadingOfCommonDownloadItem:commonDownloadItem withUrlString:urlString];
+                    [self _retryDownloadingOfCommonDownloadItem:commonDownloadItem withUrlString:urlString];
                 });
                 return;
             }
@@ -661,6 +638,29 @@ didCompleteWithError:(NSError *)error {
 }
 
 #pragma mark - Private methods
+
+- (void)_retryDownloadingOfCommonDownloadItem:(ZACommonDownloadItem*)commonDownloadItem withUrlString:(NSString *)urlString {
+    if (commonDownloadItem.commonResumeData) {
+        
+    } else {
+        
+        [commonDownloadItem.commonDownloadTask cancel];
+        
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        NSURLSessionDownloadTask *downloadTask;
+        
+        if (commonDownloadItem.backgroundMode) {
+            downloadTask = [self.backgroundURLSession downloadTaskWithRequest:request];
+        } else {
+            downloadTask = [self.forcegroundURLSession downloadTaskWithRequest:request];
+        }
+        
+        commonDownloadItem.commonDownloadTask = downloadTask;
+        _totalDownloadingUrls++;
+        [commonDownloadItem startDownloadingAllRequests];
+    }
+}
 
 - (ZACommonDownloadItem *)_getZACommonDownloadItemWithRequestItem:(ZARequestItem *)requestItem {
     ZACommonDownloadItem *item = nil;
