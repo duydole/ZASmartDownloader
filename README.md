@@ -1,10 +1,17 @@
 # ZASmartDownloader
 ZADownloadManager is built on **NSURLSession** with many useful features such as: download files, download images, caching and optimize for multiple download request,...
 
+
+![alt text](https://github.com/duydole/ZASmartDownloader/blob/master/demo.png?raw=true)
+
 ## Features
 
 - Download files, images and save to custom directory.
+- Support download files with priority: HIGH, MEDIUM, LOW
 - Optimize download on multithread and only download 1 time if there are many same requests.
+- Support retry which interrupted network.
+- Support checks how many downloading files.
+- Support config timeout interval for DownloadManager.
 - Support download multiple files at the same time.
 - Support start, pause, resume, retry download.
 - Support download background or foreground mode.
