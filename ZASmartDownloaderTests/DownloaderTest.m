@@ -89,7 +89,7 @@
     [self waitForExpectations:@[expectation] timeout:10];
 }
 
-- (void)testMultipleRequestForDownloadingAUrlOnForceground {
+- (void)testMultipleRequestForDownloadingAUrlOnForeground {
     /// Test download multiple requests
     /// 10 reqeust download 1 URL cùng 1 lúc, nhận được 10 completion
     NSInteger totalOfRequests = 10;
@@ -117,6 +117,138 @@
     });
     
     [self waitForExpectations:@[expectation] timeout:5.0];
+}
+
+- (void)testConcurrentDownloadOnForeground {
+    /// Test download 2 urls concurrently
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Test download 2 urls concurrent in background"];
+    expectation.expectedFulfillmentCount = 2;
+    BOOL backgroundMode = NO;
+    NSString *url1 = imageUrl1;
+    [NSFileManager deleteFileName:[url1 lastPathComponent] inDirectoryURL:TEST_DOWNLOAD_DIR_URL];
+    NSString *url2 = imageUrl2;
+    [NSFileManager deleteFileName:[url2 lastPathComponent] inDirectoryURL:TEST_DOWNLOAD_DIR_URL];
+    
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url1
+                                                     directoryName:TEST_DOWNLOAD_DIR_NAME
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl){
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url2
+                                                     directoryName:TEST_DOWNLOAD_DIR_NAME
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl) {
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+
+    [self waitForExpectations:@[expectation] timeout:10];
+}
+
+- (void)testDownloadConcurrentAUrlWithTwoDestinationUrl {
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Test download 1 url (2 request with 2 destinations)"];
+    expectation.expectedFulfillmentCount = 2;
+
+    BOOL backgroundMode = NO;
+    NSString *urlString = imageUrl2;
+    NSString *fileName = [urlString lastPathComponent];
+    NSString *directoryName1 = @"Downloaded1";
+    NSString *directoryName2 = @"Downloaded2";
+    NSURL *destination1 = [DOCUMENT_URL appendName:directoryName1];
+    NSURL *destination2 = [DOCUMENT_URL appendName:directoryName2];
+    [NSFileManager deleteFileName:fileName inDirectoryURL:destination1];
+    [NSFileManager deleteFileName:fileName inDirectoryURL:destination2];
+    
+    /// download to directory 1
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString
+                                                     directoryName:directoryName1
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl){
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+
+    /// download to directory 2
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:urlString
+                                                     directoryName:directoryName2
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl) {
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+
+    [self waitForExpectations:@[expectation] timeout:10];
+}
+
+#pragma mark - Background Download TestCases
+
+- (void)testMultipleRequestForDownloadingAUrlInBackground {
+    NSInteger totalOfRequests = 3;
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Test download 1 url by multiple concurrent requests."];
+    expectation.expectedFulfillmentCount = totalOfRequests;
+
+    BOOL backgroundMode = YES;
+    NSString *fileName = [imageUrl1 lastPathComponent];
+    NSString *directoryName = @"Downloaded Images";
+    [NSFileManager deleteFileName:fileName inDirectoryURL:[DOCUMENT_URL appendName:directoryName]];
+    
+    dispatch_apply(totalOfRequests, DISPATCH_APPLY_AUTO, ^(size_t t) {
+        [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:imageUrl1
+                                                         directoryName:directoryName
+                                                  enableBackgroundMode:backgroundMode
+                                                              priority:ZADownloadModelPriroityHigh
+                                                              progress:nil
+                                                            completion:^(NSURL *destinationUrl) {
+            XCTAssert(destinationUrl);
+            [expectation fulfill];
+        } failure:nil];
+    });
+
+    [self waitForExpectations:@[expectation] timeout:10];
+}
+
+- (void)testDownloadConcurrentUrlsInBackground {
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Test download 2 urls concurrent in background"];
+    expectation.expectedFulfillmentCount = 2;
+
+    BOOL backgroundMode = YES;
+    NSString *url1 = imageUrl1;
+    NSString *url2 = imageUrl2;
+    [NSFileManager deleteFileName:[url1 lastPathComponent] inDirectoryURL:TEST_DOWNLOAD_DIR_URL];
+    [NSFileManager deleteFileName:[url2 lastPathComponent] inDirectoryURL:TEST_DOWNLOAD_DIR_URL];
+
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url1
+                                                     directoryName:TEST_DOWNLOAD_DIR_NAME
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl) {
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+
+    [ZADownloadManager.sharedZADownloadManager downloadFileWithURL:url2
+                                                     directoryName:TEST_DOWNLOAD_DIR_NAME
+                                              enableBackgroundMode:backgroundMode
+                                                          priority:ZADownloadModelPriroityHigh
+                                                          progress:nil
+                                                        completion:^(NSURL *destinationUrl) {
+        XCTAssert(destinationUrl);
+        [expectation fulfill];
+    } failure:nil];
+    
+    [self waitForExpectations:@[expectation] timeout:10];
 }
 
 @end

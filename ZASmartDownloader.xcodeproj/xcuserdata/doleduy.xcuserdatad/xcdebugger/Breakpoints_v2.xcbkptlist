@@ -36,7 +36,7 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - c8301854a23185c6"
+                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - afff3d044a01830a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -51,7 +51,7 @@
                   offsetFromSymbolStart = "56">
                </Location>
                <Location
-                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - c8301854a23185c6"
+                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - afff3d044a01830a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -63,10 +63,10 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "60"
                   endingLineNumber = "60"
-                  offsetFromSymbolStart = "476">
+                  offsetFromSymbolStart = "436">
                </Location>
                <Location
-                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - c8301854a23185c6"
+                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - afff3d044a01830a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -78,10 +78,10 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "60"
                   endingLineNumber = "60"
-                  offsetFromSymbolStart = "1223">
+                  offsetFromSymbolStart = "1143">
                </Location>
                <Location
-                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - c8301854a23185c6"
+                  uuid = "A85334CB-5762-43E0-A4B6-703A1D471616 - afff3d044a01830a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -93,103 +93,7 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "60"
                   endingLineNumber = "60"
-                  offsetFromSymbolStart = "1323">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "1904C69F-3A09-4547-B30B-ED4F7C76D29D"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
-            landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "1904C69F-3A09-4547-B30B-ED4F7C76D29D - 359c89875e9d565"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadManager downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:]"
-                  moduleName = "ZASmartDownloader"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/doleduy/Desktop/ZASmartDownloader/ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "134"
-                  endingLineNumber = "134"
-                  offsetFromSymbolStart = "430">
-               </Location>
-               <Location
-                  uuid = "1904C69F-3A09-4547-B30B-ED4F7C76D29D - a336bbcb7708267d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadManager downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:]"
-                  moduleName = "ZASmartDownloaderTests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/doleduy/Desktop/ZASmartDownloader/ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "134"
-                  endingLineNumber = "134"
-                  offsetFromSymbolStart = "430">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "B8015256-E23E-4022-A744-7B848DD9FBD2"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "131"
-            endingLineNumber = "131"
-            landmarkName = "-downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "B8015256-E23E-4022-A744-7B848DD9FBD2 - 359c89875e9d565"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadManager downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:]"
-                  moduleName = "ZASmartDownloader"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/doleduy/Desktop/ZASmartDownloader/ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "131"
-                  endingLineNumber = "131"
-                  offsetFromSymbolStart = "206">
-               </Location>
-               <Location
-                  uuid = "B8015256-E23E-4022-A744-7B848DD9FBD2 - a336bbcb7708267d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[ZADownloadManager downloadFileWithURL:directoryName:enableBackgroundMode:priority:progress:completion:failure:]"
-                  moduleName = "ZASmartDownloaderTests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/doleduy/Desktop/ZASmartDownloader/ZASmartDownloader/Business/ZADownloadManager/ZADownloadManager.m"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "131"
-                  endingLineNumber = "131"
-                  offsetFromSymbolStart = "206">
+                  offsetFromSymbolStart = "1236">
                </Location>
             </Locations>
          </BreakpointContent>
