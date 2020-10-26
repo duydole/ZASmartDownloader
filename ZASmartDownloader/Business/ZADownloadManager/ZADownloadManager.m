@@ -127,8 +127,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ZADownloadManager);
                    progress:(ZADownloadProgressBlock)progressBlock
                  completion:(ZADownloadCompletionBlock)completionBlock
                     failure:(ZADownloadErrorBlock)errorBlock {
+    /// Create directory if need
+    [NSFileManager createDirectoryAtDocumentsIfNeedWithName:directoryName];
+    NSURL *destinationUrl = [[DOCUMENT_URL appendName:directoryName] appendName:[urlString lastPathComponent]];
+    
     [self downloadFileWithURL:urlString
-               destinationUrl:nil
+               destinationUrl:destinationUrl
          enableBackgroundMode:backgroundMode
                    retryCount:DEFAULT_RETRY_COUNT
                 retryInterval:DEFAULT_RETRY_INTERVAL
@@ -476,22 +480,22 @@ didFinishDownloadingToURL:(NSURL *)location {
         NSError *error;
         NSURL *tempUrl;
         
-        // Copy files to all RequestItem.DestinationUrl:
+        /// Copy files to all RequestItem.DestinationUrl:
         for (ZARequestItem *requestItem in commonDownloadItem.requestItemsDict.allValues) {
             
-            // If subModel is downloading ~ move to it's destination.
+            /// If subModel is downloading ~ move to it's destination.
             if (requestItem.state == ZADownloadItemStateDownloading) {
                 
-                // copy to TEMP Dir
+                /// copy to TEMP Dir
                 tempUrl = [TEMP_URL URLByAppendingPathComponent:[urlString lastPathComponent]];
                 ifnot ([TEMP_URL containFileName:[urlString lastPathComponent]]) {
                     [[NSFileManager defaultManager] copyItemAtURL:location toURL:tempUrl error:&error];                             // copy to TEMP
                 }
                 
-                // copy to DESTINATION Url.
+                /// copy to DESTINATION Url.
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:requestItem.destinationUrl error:&error];          // copy to DESTINATION.
                 
-                // callback
+                /// callback
                 ZADownloadCompletionBlock completion = requestItem.completionBlock;
                 if (completion) {
                     dispatch_async(_concurrentQueue, ^{
@@ -504,8 +508,8 @@ didFinishDownloadingToURL:(NSURL *)location {
             }
         }
         
-        // Check If is existed a Paused RequestItem.
-        // -> Don't remove out of Dictionary.
+        /// Check If is existed a Paused RequestItem.
+        /// -> Don't remove out of Dictionary.
         if (commonDownloadItem.requestItemsDict.allKeys.count == 0) {
             if (commonDownloadItem.backgroundMode) {
                 [_backgroundDownloadItemsDict removeObjectForKey:urlString];
@@ -514,11 +518,11 @@ didFinishDownloadingToURL:(NSURL *)location {
             }
         }
         
-        // resume a waiting download.
+        /// resume a waiting download.
         [self _startHighestPriorityZADownloadItem];
     } else {
-        // old downloadtask run success when user opens the app.
-        // so, it's not exist any DownloadModel in Dictionary.
+        /// old downloadtask run success when user opens the app.
+        /// so, it's not exist any DownloadModel in Dictionary.
         [downloadTask cancel];
     }
 }

@@ -27,6 +27,7 @@
 		F2AB164D25426F000040B916 /* ZADownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F227D25F2540048D00D83ED4 /* ZADownloadManager.m */; };
 		F2AB165025426F310040B916 /* ZASmartDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EC4DF11A22CC9E8B0049DBFF /* ZASmartDownloaderTests.m */; };
 		F2AB16532542704A0040B916 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = F2AB16522542704A0040B916 /* UIImage+Extension.m */; };
+		F2E9F74A2546989100BBAC7D /* DownloaderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F2E9F7492546989100BBAC7D /* DownloaderTest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		F24F4F992541597000DFC2CF /* NSURL+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Extension.m"; sourceTree = "<group>"; };
 		F2AB16512542704A0040B916 /* UIImage+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Extension.h"; sourceTree = "<group>"; };
 		F2AB16522542704A0040B916 /* UIImage+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Extension.m"; sourceTree = "<group>"; };
+		F2E9F7492546989100BBAC7D /* DownloaderTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DownloaderTest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +165,7 @@
 		EC4DF11922CC9E8B0049DBFF /* ZASmartDownloaderTests */ = {
 			isa = PBXGroup;
 			children = (
+				F2E9F7492546989100BBAC7D /* DownloaderTest.m */,
 				EC4DF11A22CC9E8B0049DBFF /* ZASmartDownloaderTests.m */,
 				EC4DF11C22CC9E8B0049DBFF /* Info.plist */,
 			);
@@ -419,6 +422,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2AB164D25426F000040B916 /* ZADownloadManager.m in Sources */,
+				F2E9F74A2546989100BBAC7D /* DownloaderTest.m in Sources */,
 				F2AB165025426F310040B916 /* ZASmartDownloaderTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -19,4 +19,13 @@
     return existed;
 }
 
+- (BOOL)containDirectoryWithName:(NSString *)directoryName {
+    return [self containFileName:directoryName];
+}
+
+- (NSURL *)appendName:(NSString *)name {
+    ifnot (name) return self;
+    return [self URLByAppendingPathComponent:name];
+}
+
 @end

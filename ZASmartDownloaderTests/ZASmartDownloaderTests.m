@@ -38,49 +38,7 @@
 //    ZADownloadManager.sharedInstance.maxConcurrentDownloads = -1;
 //    _downloadedImageDirectoryUrl = [ZADownloadManager.sharedInstance getDefaultDownloadedImageDirectoryUrl];
 //}
-//
-//- (void)tearDown {
-//    // Put teardown code here. This method is called after the invocation of each test method in the class.
-//}
-//
-//- (void) testThatZAFileDownloaderSingletonCanBeInitialized {
-//    ZADownloadManager *downloadManager = [ZADownloadManager sharedInstance];
-//    XCTAssertNotNil(downloadManager,@"ZAFileDownloader.shareInstance should be not nil");
-//}
-//
-//- (void) testDownloadInvalidUrl {
-//    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Download should fail."];
-//    NSString *invalidUrl = @"invalidurl.com";
-//    // check valid url base on scheme, host is exist.
-//    // test case: https://google.com failed.
-//
-//    [ZADownloadManager.sharedInstance downloadFileWithURL:invalidUrl directoryName:nil enableBackgroundMode:NO priority:ZADownloadModelPriroityHigh progress:nil completion:nil failure:^(NSError *error) {
-//        XCTAssertNotNil(error);
-//        XCTAssertEqual(error.code, DownloadErrorCodeInvalidUrl, "Invalid url");
-//        [expectation fulfill];
-//    }];
-//
-//    [self waitForExpectations:@[expectation] timeout:1];
-//}
-//
-//- (void) testDownloadOneUrlOnForceground {
-//    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"File should be downloaded successful"];
-//
-//    BOOL backgroundMode = NO;
-//    NSString *fileName = @"FileNameExample.mp3";
-//    NSString *directoryName = @"Directory Name Example";
-//
-//    // delete if existed:
-//    [self deleteFileName:fileName inDirectory:directoryName];
-//
-//    [ZADownloadManager.sharedInstance downloadFileWithURL:urlString3 directoryName:directoryName enableBackgroundMode:backgroundMode priority:UILayoutPriorityDefaultHigh progress:nil completion:^(NSURL *destinationUrl) {
-//        XCTAssertNotNil(destinationUrl);
-//        [expectation fulfill];
-//    } failure:nil];
-//
-//    [self waitForExpectations:@[expectation] timeout:10];
-//}
-//
+
 //// download 1 url with the same directory:
 //- (void) testMultipleRequestForDownloadingAUrlOnForceground {
 //    NSInteger totalOfRequests = 3;  // download 1 url 3 times.

@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSURL (Extension)
 
 - (BOOL)containFileName:(NSString *)fileName;
+- (BOOL)containDirectoryWithName:(NSString *)directoryName;
+- (NSURL *)appendName:(NSString *)name;
 
 @end
 
